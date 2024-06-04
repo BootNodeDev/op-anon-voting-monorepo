@@ -1,0 +1,36 @@
+{
+  "name": "@BootNodeDev/op-anon-voting-contracts",
+  "description": "",
+  "version": "0.1.0",
+  "author": {
+    "name": "BootNode.dev",
+    "url": "https://github.com/BootNode.dev"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.6",
+    "@zk-kit/incremental-merkle-tree.sol": "1.7.0",
+    "semaphore": "git+ssh://github.com/semaphore-protocol/semaphore#v3.15.2"
+  },
+  "devDependencies": {
+    "forge-std": "github:foundry-rs/forge-std#v1.8.1",
+    "solhint": "^3.6.2"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "forge",
+    "foundry",
+    "smart-contracts",
+    "solidity",
+    "template"
+  ],
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf cache out",
+    "build": "forge build",
+    "lint": "forge fmt --check && bun solhint '{script,src,test}/**/*.sol'",
+    "test": "forge test",
+    "test:coverage": "forge coverage",
+    "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage"
+  }
+}
