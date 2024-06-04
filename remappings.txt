@@ -1,2 +1,3 @@
 @openzeppelin/contracts/=node_modules/@openzeppelin/contracts/
 forge-std/=node_modules/forge-std/
+semaphore/=node_modules/semaphore/packages/contracts/contracts/
