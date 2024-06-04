@@ -7,7 +7,9 @@
     "url": "https://github.com/BootNode.dev"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.1"
+    "@openzeppelin/contracts": "^4.9.6",
+    "@zk-kit/incremental-merkle-tree.sol": "1.7.0",
+    "semaphore": "git+ssh://github.com/semaphore-protocol/semaphore#v3.15.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
