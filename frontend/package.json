@@ -8,7 +8,6 @@
     "dev": "next dev",
     "lint": "next lint",
     "lint:fix": "eslint --fix \"./**/*.{js,jsx,ts,tsx}\"",
-    "prepare": "husky install",
     "prettier:fix": "prettier --write \"./**/*.{js,jsx,ts,tsx}\"",
     "start": "next start",
     "typechain": "typechain --target=ethers-v5 ./src/contracts/abis/**/*.json --out-dir ./types/generated/typechain/",
