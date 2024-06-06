@@ -49,12 +49,12 @@ contract AddVoter is AnonVotingTest {
     }
 
     function test_RevertIf_AttestationDoesNotBelongToVoter() public {
-        vm.expectRevert("Attestation does not belong to voter");
+        vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Does not belong to voter"));
         anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
     }
 
     function test_RevertIf_AttestationIsNotFromTrustedAttester() public {
-        vm.expectRevert("Attestation is not from trusted attester");
+        vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Not from trusted attester"));
         anonVoting.addVoter(pollId, identityCommitment, FAKE_UID);
     }
 
@@ -63,7 +63,7 @@ contract AddVoter is AnonVotingTest {
         vm.prank(att.recipient);
         anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
 
-        vm.expectRevert("Already registered");
+        vm.expectRevert(abi.encodeWithSelector(AnonVoting.AlreadyRegistered.selector, att.recipient));
         vm.prank(att.recipient);
         anonVoting.addVoter(pollId, 69, REAL_UID);
     }

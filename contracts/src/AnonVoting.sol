@@ -9,6 +9,9 @@ import { IEAS, Attestation } from "@ethereum-attestation-service/eas-contracts/c
 import { OPTIMISM_ATTESTER, EAS } from "src/constants.sol";
 
 contract AnonVoting is SemaphoreVoting {
+    error InvalidAttestation(string message);
+    error AlreadyRegistered(address voter);
+
     IEAS internal eas = IEAS(EAS);
 
     mapping(address => bool) internal alreadyRegistered;
@@ -18,9 +21,9 @@ contract AnonVoting is SemaphoreVoting {
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
         Attestation memory att = eas.getAttestation(uid);
 
-        require(att.attester == OPTIMISM_ATTESTER, "Attestation is not from trusted attester");
-        require(att.recipient == msg.sender, "Attestation does not belong to voter");
-        require(!alreadyRegistered[msg.sender], "Already registered");
+        if (att.attester != OPTIMISM_ATTESTER) revert InvalidAttestation("Not from trusted attester");
+        if (att.recipient != msg.sender) revert InvalidAttestation("Does not belong to voter");
+        if (alreadyRegistered[msg.sender]) revert AlreadyRegistered(msg.sender);
 
         if (polls[pollId].state != PollState.Created) {
             revert Semaphore__PollHasAlreadyBeenStarted();
