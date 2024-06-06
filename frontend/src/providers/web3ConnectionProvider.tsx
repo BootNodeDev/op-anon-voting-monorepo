@@ -13,7 +13,7 @@ import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers'
 import { OnboardAPI, WalletState } from '@web3-onboard/core'
 import injectedModule from '@web3-onboard/injected-wallets'
 import { init, useConnectWallet, useSetChain, useWallets } from '@web3-onboard/react'
-import walletConnectModule from '@web3-onboard/walletconnect'
+// import walletConnectModule from '@web3-onboard/walletconnect'
 import nullthrows from 'nullthrows'
 
 import { Chains, INITIAL_APP_CHAIN_ID, chainsConfig, getNetworkConfig } from '@/src/config/web3'
@@ -36,7 +36,7 @@ nullthrows(
 )
 
 const injected = injectedModule()
-const walletConnect = walletConnectModule({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID })
+// const walletConnect = walletConnectModule({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID })
 
 const chainsForOnboard = Object.values(chainsConfig).map(
   ({ chainIdHex, name, rpcUrl, token }: ChainConfig) => ({
@@ -53,7 +53,7 @@ export function initOnboard() {
   if (typeof window === 'undefined' || window?.onboard || onBoardApi) return
 
   onBoardApi = init({
-    wallets: [injected, walletConnect],
+    wallets: [injected /*, walletConnect */],
     chains: chainsForOnboard,
     notify: {
       enabled: false,
