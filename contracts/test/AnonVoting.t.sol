@@ -58,6 +58,12 @@ contract AddVoter is AnonVotingTest {
         anonVoting.addVoter(pollId, identityCommitment, FAKE_UID);
     }
 
+    function test_RevertIf_CoordinatorAttemptsToAddVoter() public {
+        vm.expectRevert(AnonVoting.SelfEnrollmentOnly.selector);
+        vm.prank(COORDINATOR);
+        anonVoting.addVoter(pollId, identityCommitment);
+    }
+
     function test_RevertIf_VoterAttemptsDoubleRegistration() public {
         Attestation memory att = eas.getAttestation(REAL_UID);
         vm.prank(att.recipient);

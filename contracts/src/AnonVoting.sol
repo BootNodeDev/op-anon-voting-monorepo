@@ -11,6 +11,7 @@ import { OPTIMISM_ATTESTER, EAS } from "src/constants.sol";
 contract AnonVoting is SemaphoreVoting {
     error InvalidAttestation(string message);
     error AlreadyRegistered(address voter);
+    error SelfEnrollmentOnly();
 
     IEAS internal eas = IEAS(EAS);
 
@@ -32,5 +33,11 @@ contract AnonVoting is SemaphoreVoting {
         alreadyRegistered[msg.sender] = true;
 
         _addMember(pollId, identityCommitment);
+    }
+
+    function _addMember(uint256 pollId, uint256 identityCommitment) internal override {
+        if (msg.sender == polls[pollId].coordinator) revert SelfEnrollmentOnly();
+
+        super._addMember(pollId, identityCommitment);
     }
 }
