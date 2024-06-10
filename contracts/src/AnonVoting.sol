@@ -2,7 +2,7 @@
 pragma solidity 0.8.4;
 
 import { ISemaphoreVerifier } from "semaphore/interfaces/ISemaphoreVerifier.sol";
-import { SemaphoreVoting } from "semaphore/extensions/SemaphoreVoting.sol";
+import { SemaphoreVoting } from "src/vendor/SemaphoreVoting.sol";
 
 import { IEAS, Attestation } from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
