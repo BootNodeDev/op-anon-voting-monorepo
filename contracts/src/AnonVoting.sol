@@ -35,9 +35,12 @@ contract AnonVoting is SemaphoreVoting {
         _addMember(pollId, identityCommitment);
     }
 
-    function _addMember(uint256 pollId, uint256 identityCommitment) internal override {
-        if (msg.sender == polls[pollId].coordinator) revert SelfEnrollmentOnly();
-
-        super._addMember(pollId, identityCommitment);
+    /// @notice Disable adding voters via coordinator to prevent double/multi
+    ///         enrollment with different identity commitments for the same
+    ///         voter.
+    /// @dev    Only callable by poll coordinator to maintain original behaviour,
+    ///         although for now it will always revert with `SelfEnrollmentOnly`.
+    function addVoter(uint256 pollId, uint256) public view override onlyCoordinator(pollId) {
+        revert SelfEnrollmentOnly();
     }
 }
