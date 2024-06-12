@@ -7,7 +7,7 @@ import { SemaphoreGroups } from "semaphore/base/SemaphoreGroups.sol";
 
 /**
  * @notice This file is a verbatim copy of semaphore/extensions/SemaphoreVoting.sol,
- *  where the function `addVoter` is marked as `virtual` for overriding in a child contract.
+ *  where the some functions are marked as `virtual` for overriding in a child contract.
  *  Copied from commit 3a7f18652f933d7afcfbb3f58174e88514380dfa
  */
 
@@ -59,7 +59,7 @@ contract SemaphoreVoting is ISemaphoreVoting, SemaphoreGroups {
     }
 
     /// @dev See {ISemaphoreVoting-addVoter}.
-    function startPoll(uint256 pollId, uint256 encryptionKey) public override onlyCoordinator(pollId) {
+    function startPoll(uint256 pollId, uint256 encryptionKey) public virtual override onlyCoordinator(pollId) {
         if (polls[pollId].state != PollState.Created) {
             revert Semaphore__PollHasAlreadyBeenStarted();
         }
@@ -90,7 +90,7 @@ contract SemaphoreVoting is ISemaphoreVoting, SemaphoreGroups {
     }
 
     /// @dev See {ISemaphoreVoting-publishDecryptionKey}.
-    function endPoll(uint256 pollId, uint256 decryptionKey) public override onlyCoordinator(pollId) {
+    function endPoll(uint256 pollId, uint256 decryptionKey) public virtual override onlyCoordinator(pollId) {
         if (polls[pollId].state != PollState.Ongoing) {
             revert Semaphore__PollIsNotOngoing();
         }

@@ -6,6 +6,7 @@ import { Test } from "forge-std/src/Test.sol";
 import { console2 } from "forge-std/src/console2.sol";
 
 import { SemaphoreVerifier } from "semaphore/base/SemaphoreVerifier.sol";
+import { ISemaphoreVoting } from "src/vendor/SemaphoreVoting.sol";
 
 import { IEAS, Attestation } from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
@@ -25,9 +26,12 @@ contract AnonVotingTest is Test {
     uint256 internal pollId = 1;
     uint256 internal identityCommitment = 42;
 
+    uint256 internal encryptionKey = 12_345;
+    uint256 internal decryptionKey = 67_890;
+
     IEAS internal eas = IEAS(EAS);
 
-    function setUp() public {
+    function setUp() public virtual {
         vm.createSelectFork("optimism", 120_069_420);
 
         verifier = new SemaphoreVerifier();
@@ -75,4 +79,39 @@ contract AddVoter is AnonVotingTest {
     }
 
     event MemberAdded(uint256 indexed groupId, uint256 index, uint256 identityCommitment, uint256 merkleTreeRoot);
+}
+
+contract StartPoll is AnonVotingTest {
+    function test_StoresEncryptionKey() public {
+        vm.prank(COORDINATOR);
+        anonVoting.startPoll(pollId, encryptionKey);
+
+        assertEq(anonVoting.encryptionKey(pollId), encryptionKey);
+    }
+
+    function test_RevertWhen_NotCalledByCoordinator() public {
+        vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
+        anonVoting.startPoll(pollId, encryptionKey);
+    }
+}
+
+contract EndPoll is AnonVotingTest {
+    function setUp() public override {
+        super.setUp();
+
+        vm.prank(COORDINATOR);
+        anonVoting.startPoll(pollId, encryptionKey);
+    }
+
+    function test_StoresDecryptionKey() public {
+        vm.prank(COORDINATOR);
+        anonVoting.endPoll(pollId, decryptionKey);
+
+        assertEq(anonVoting.decryptionKey(pollId), decryptionKey);
+    }
+
+    function test_RevertWhen_NotCalledByCoordinator() public {
+        vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
+        anonVoting.endPoll(pollId, decryptionKey);
+    }
 }

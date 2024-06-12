@@ -17,6 +17,9 @@ contract AnonVoting is SemaphoreVoting {
 
     mapping(address => bool) internal alreadyRegistered;
 
+    mapping(uint256 => uint256) public encryptionKey;
+    mapping(uint256 => uint256) public decryptionKey;
+
     constructor(ISemaphoreVerifier _verifier) SemaphoreVoting(_verifier) { }
 
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
@@ -42,5 +45,15 @@ contract AnonVoting is SemaphoreVoting {
     ///         although for now it will always revert with `SelfEnrollmentOnly`.
     function addVoter(uint256 pollId, uint256) public view override onlyCoordinator(pollId) {
         revert SelfEnrollmentOnly();
+    }
+
+    function startPoll(uint256 pollId, uint256 _encryptionKey) public override onlyCoordinator(pollId) {
+        super.startPoll(pollId, _encryptionKey);
+        encryptionKey[pollId] = _encryptionKey;
+    }
+
+    function endPoll(uint256 pollId, uint256 _decryptionKey) public override onlyCoordinator(pollId) {
+        super.endPoll(pollId, _decryptionKey);
+        decryptionKey[pollId] = _decryptionKey;
     }
 }
