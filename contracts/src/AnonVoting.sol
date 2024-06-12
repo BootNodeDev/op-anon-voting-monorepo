@@ -2,7 +2,7 @@
 pragma solidity 0.8.4;
 
 import { ISemaphoreVerifier } from "semaphore/interfaces/ISemaphoreVerifier.sol";
-import { SemaphoreVoting } from "semaphore/extensions/SemaphoreVoting.sol";
+import { SemaphoreVoting } from "src/vendor/SemaphoreVoting.sol";
 
 import { IEAS, Attestation } from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
@@ -11,6 +11,7 @@ import { OPTIMISM_ATTESTER, EAS } from "src/constants.sol";
 contract AnonVoting is SemaphoreVoting {
     error InvalidAttestation(string message);
     error AlreadyRegistered(address voter);
+    error SelfEnrollmentOnly();
 
     IEAS internal eas = IEAS(EAS);
 
@@ -32,5 +33,14 @@ contract AnonVoting is SemaphoreVoting {
         alreadyRegistered[msg.sender] = true;
 
         _addMember(pollId, identityCommitment);
+    }
+
+    /// @notice Disable adding voters via coordinator to prevent double/multi
+    ///         enrollment with different identity commitments for the same
+    ///         voter.
+    /// @dev    Only callable by poll coordinator to maintain original behaviour,
+    ///         although for now it will always revert with `SelfEnrollmentOnly`.
+    function addVoter(uint256 pollId, uint256) public view override onlyCoordinator(pollId) {
+        revert SelfEnrollmentOnly();
     }
 }
