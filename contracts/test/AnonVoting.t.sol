@@ -48,6 +48,20 @@ contract AddVoter is AnonVotingTest {
         anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
     }
 
+    function test_CanEnrollForMultiplePolls() public {
+        Attestation memory att = eas.getAttestation(REAL_UID);
+        vm.prank(att.recipient);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+
+        anonVoting.createPoll(69, COORDINATOR, 32);
+
+        vm.expectEmit(true, true, true, false, address(anonVoting));
+        emit MemberAdded(69, 0, identityCommitment, 0);
+
+        vm.prank(att.recipient);
+        anonVoting.addVoter(69, identityCommitment, REAL_UID);
+    }
+
     function test_RevertIf_AttestationDoesNotBelongToVoter() public {
         vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Does not belong to voter"));
         anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
@@ -64,12 +78,12 @@ contract AddVoter is AnonVotingTest {
         anonVoting.addVoter(pollId, identityCommitment);
     }
 
-    function test_RevertIf_VoterAttemptsDoubleRegistration() public {
+    function test_RevertIf_VoterAttemptsDoubleEnrollment() public {
         Attestation memory att = eas.getAttestation(REAL_UID);
         vm.prank(att.recipient);
         anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
 
-        vm.expectRevert(abi.encodeWithSelector(AnonVoting.AlreadyRegistered.selector, att.recipient));
+        vm.expectRevert(abi.encodeWithSelector(AnonVoting.AlreadyEnrolled.selector, att.recipient, pollId));
         vm.prank(att.recipient);
         anonVoting.addVoter(pollId, 69, REAL_UID);
     }
