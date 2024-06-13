@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 
 import { Modal } from '@/src/components/common/Modal'
+import { ChainIds } from '@/src/config/wagmi'
 import { chainsConfig } from '@/src/config/web3'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 
@@ -48,7 +49,7 @@ export const ModalSwitchNetwork: React.FC<{ onClose: () => void }> = ({
           <NetworkButton
             key={index}
             onClick={() => {
-              setAppChainId(item.chainId)
+              setAppChainId(item.id as ChainIds)
               pushNetwork({ chainId: item.chainIdHex })
               onClose()
             }}

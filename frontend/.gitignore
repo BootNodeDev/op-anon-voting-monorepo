@@ -38,6 +38,9 @@ yarn-error.log*
 
 #types
 /types/typechain
+/src/hooks/generated/*
 
 #IDE files
 /.idea
+bun.lockb
+.env

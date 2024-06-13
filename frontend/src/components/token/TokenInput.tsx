@@ -2,8 +2,7 @@ import { DOMAttributes, HTMLAttributes, useCallback, useEffect, useMemo } from '
 import styled, { css } from 'styled-components'
 
 import { BigNumberInput } from 'big-number-input'
-import { BigNumber } from 'ethers/lib/ethers'
-import { formatUnits } from 'ethers/lib/utils'
+import { formatUnits } from 'viem'
 
 import { Textfield as BaseTextField, TextfieldStatus } from '@/src/components/form/Textfield'
 
@@ -149,9 +148,9 @@ export const TokenInput = ({
   value,
   ...restProps
 }: Props) => {
-  const maxValueFormatted = formatUnits(maxValue, decimals)
+  const maxValueFormatted = formatUnits(BigInt(maxValue), decimals)
   const valueGreaterThanMaxValue = useMemo(
-    () => (value && BigNumber.from(value).gt(maxValue) ? true : false),
+    () => (value && BigInt(value) > BigInt(maxValue) ? true : false),
     [maxValue, value],
   )
 

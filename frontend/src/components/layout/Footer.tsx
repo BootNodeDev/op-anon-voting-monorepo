@@ -42,6 +42,7 @@ const Item = styled.span`
 `
 
 export const Footer: React.FC = (props) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const year = new Date().getFullYear()
   const { cookiesWarningEnabled, showCookiesWarning } = useCookiesWarningContext()
 

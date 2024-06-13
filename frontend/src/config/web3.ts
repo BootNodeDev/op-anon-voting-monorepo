@@ -1,106 +1,28 @@
-import nullthrows from 'nullthrows'
+import { numberToHex } from 'viem'
+import { optimism, optimismSepolia } from 'viem/chains'
 
-import { ChainConfig, ChainsValues } from '@/types/chains'
-import { ObjectValues, ProviderChains, RPCProviders, RPCProvidersENV } from '@/types/utils'
+import { getProviderUrl } from './providers'
+import { ChainNames } from './wagmi'
+import { ChainConfig } from '@/types/chains'
 
-export const Chains = {
-  //mainnet: 1,
-  optimism: 10,
-  'optimism-sepolia': 11155420,
-} as const
-
-export const providerChains: ProviderChains = {
-  [RPCProviders.infura]: {
-    [Chains.optimism]: 'optimism-mainnet',
-    [Chains['optimism-sepolia']]: 'optimism-sepolia',
+export const chainsConfig: Record<ChainNames, ChainConfig> = {
+  'OP Sepolia': {
+    ...optimismSepolia,
+    chainIdHex: numberToHex(optimismSepolia.id),
+    rpcUrl: getProviderUrl('OP Sepolia'),
+    token: optimismSepolia.nativeCurrency.symbol,
+    blockExplorerUrls: [
+      optimismSepolia.blockExplorers.default.url,
+      'https://sepolia-optimism.etherscan.io',
+    ],
   },
-  [RPCProviders.alchemy]: {
-    [Chains.optimism]: 'opt-mainnet',
-    [Chains['optimism-sepolia']]: 'opt-sepolia',
+  'OP Mainnet': {
+    ...optimism,
+    chainIdHex: numberToHex(optimism.id),
+    rpcUrl: getProviderUrl('OP Mainnet'),
+    token: optimism.nativeCurrency.symbol,
+    blockExplorerUrls: [optimism.blockExplorers.default.url, 'https://optimistic.etherscan.io'],
   },
 }
 
-const getInfuraRPCUrl = (chainId: ChainsValues) =>
-  `https://${providerChains[RPCProviders.infura][chainId]}.infura.io/v3/${
-    process.env.NEXT_PUBLIC_INFURA_TOKEN
-  }`
-
-const getAlchemyRPCUrl = (chainId: ChainsValues) =>
-  `https://${providerChains[RPCProviders.alchemy][chainId]}.g.alchemy.com/v2/${
-    process.env.NEXT_PUBLIC_ALCHEMY_TOKEN
-  }`
-
-export const getProviderUrl = (
-  chainId: ChainsValues,
-  provider?: ObjectValues<typeof RPCProviders>,
-) => {
-  if (!RPCProvidersENV[RPCProviders.infura] && !RPCProvidersENV[RPCProviders.alchemy]) {
-    throw new Error(`You must set infura/alchemy token provider in environment variable`)
-  }
-
-  //Manual provider
-  if (provider === RPCProviders.infura && RPCProvidersENV[RPCProviders.infura])
-    return getInfuraRPCUrl(chainId)
-
-  if (provider === RPCProviders.alchemy && RPCProvidersENV[RPCProviders.alchemy])
-    return getAlchemyRPCUrl(chainId)
-
-  // Auto-magic provider
-  if (RPCProvidersENV[RPCProviders.infura]) return getInfuraRPCUrl(chainId)
-  if (RPCProvidersENV[RPCProviders.alchemy]) return getAlchemyRPCUrl(chainId)
-
-  throw Error('Token provider could not be found')
-}
-
-// Default chain id from env var
-export const INITIAL_APP_CHAIN_ID = Number(
-  process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID || '42',
-) as ChainsValues
-
-export const chainsConfig: Record<ChainsValues, ChainConfig> = {
-  [Chains['optimism-sepolia']]: {
-    id: Chains['optimism-sepolia'],
-    name: 'Optimism Sepolia',
-    shortName: 'OP Sepolia',
-    chainId: Chains['optimism-sepolia'],
-    chainIdHex: '0xaa37dc',
-    rpcUrl: getProviderUrl(Chains['optimism-sepolia']),
-    blockExplorerUrls: ['https://sepolia-optimism.etherscan.io/'],
-    token: 'ETH',
-  },
-  [Chains['optimism']]: {
-    id: Chains['optimism'],
-    name: 'Optimism',
-    shortName: 'OP',
-    chainId: Chains['optimism'],
-    chainIdHex: '0xA',
-    rpcUrl: getProviderUrl(Chains['optimism']),
-    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
-    token: 'ETH',
-  },
-  // [Chains.mainnet]: {
-  //   id: Chains.mainnet,
-  //   name: 'Mainnet',
-  //   shortName: 'Mainnet',
-  //   chainId: Chains.mainnet,
-  //   chainIdHex: '0x1',
-  //   rpcUrl: getProviderUrl(Chains.mainnet),
-  //   blockExplorerUrls: ['https://etherscan.io/'],
-  //   token: 'ETH',
-  // },
-}
-
-export function getNetworkConfig(chainId: ChainsValues): ChainConfig {
-  const networkConfig = chainsConfig[chainId]
-  return nullthrows(networkConfig, `No config for chain id: ${chainId}`)
-}
-
-/**
- * @dev Here you can add the list of tokens you want to use in the app
- * The list follow the standard from: https://tokenlists.org/
- */
-export const TokensLists = {
-  '1INCH': 'https://gateway.ipfs.io/ipns/tokens.1inch.eth',
-  COINGECKO: 'https://tokens.coingecko.com/uniswap/all.json',
-  OPTIMISM: 'https://static.optimism.io/optimism.tokenlist.json',
-} as const
+export const getNetworkConfig = (chainKey: ChainNames) => chainsConfig[chainKey]

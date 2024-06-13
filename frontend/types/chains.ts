@@ -1,16 +1,8 @@
-import { Chains } from '@/src/config/web3'
-import { ObjectValues } from '@/types/utils'
+import { Chain } from 'viem'
 
-export type ChainConfig = {
-  id: ChainsValues
-  name: string
-  shortName: string
-  chainId: ChainsValues
+export type ChainConfig = Chain & {
   chainIdHex: string
   rpcUrl: string
-  blockExplorerUrls: string[]
   token: string
+  blockExplorerUrls: string[]
 }
-
-export type ChainsValues = ObjectValues<typeof Chains>
-export type ChainsKeys = keyof typeof Chains
