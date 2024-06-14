@@ -19,6 +19,8 @@ import { BaseTitle } from '@/src/components/text/BaseTitle'
 import { TokenDropdown } from '@/src/components/token/TokenDropdown'
 import { TokenModal } from '@/src/components/token/TokenModal'
 import TokenSpend from '@/src/components/token/TokenSpend'
+import { ChainIds, mapId2Name } from '@/src/config/wagmi'
+import { defaultChainId } from '@/src/constants/common'
 import { contracts } from '@/src/contracts/contracts'
 import { RequiredConnection } from '@/src/hooks/requiredConnection'
 import SendUSDCForm from '@/src/pagePartials/examples/SendUSDCForm'
@@ -38,12 +40,13 @@ const TokenIconsContextProvider = dynamic(() => import('@/src/providers/tokenIco
 })
 
 const LeftSidebarLayout: NextPageWithLayout = () => {
-  const { appChainId } = useWeb3Connection()
+  const { chainId } = useWeb3Connection()
   const [showModal, setShowModal] = useState(false)
   const [tokenDropdown, setTokenDropdown] = useState<Token | null>(null)
   const [tokenModal, setTokenModal] = useState<Token | null>(null)
 
-  const usdcAddress = contracts['USDC'].address[appChainId]
+  const id: ChainIds = (chainId as ChainIds) ?? defaultChainId
+  const usdcAddress = contracts['USDC'].address[mapId2Name[id]]
 
   return (
     <>
@@ -92,7 +95,8 @@ const LeftSidebarLayout: NextPageWithLayout = () => {
           <TokenSpend
             erc20Address={usdcAddress}
             label="Deposit"
-            spendAction={(): any =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            spendAction={(): any => {
               alert(`
               contract call that does something with the approval,
               like a deposit, borrow, withdraw or just a transferFrom
@@ -103,7 +107,7 @@ const LeftSidebarLayout: NextPageWithLayout = () => {
                 '1000000'
               )
             `)
-            }
+            }}
             spender="0xFdAf1D88B800308Ead39F34D5eB24eB219d68ad9"
           />
         </RequiredConnection>

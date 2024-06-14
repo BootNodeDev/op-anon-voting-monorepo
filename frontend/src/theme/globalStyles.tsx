@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components'
 import { onBoardCSS } from '@/src/theme/onBoard'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const GlobalStyles = createGlobalStyle<{ theme: any }>`
+export const GlobalStyles = createGlobalStyle<{ theme?: any }>`
   html {
     font-size: 10px;
     scroll-behavior: smooth;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { BigNumber } from '@ethersproject/bignumber'
-import { ContractTransaction } from 'ethers'
+import { TransactionReceipt, erc20Abi } from 'viem'
+import { useReadContracts, useWriteContract } from 'wagmi'
 
 import TxButton from '@/src/components/buttons/TxButton'
 import { Formfield } from '@/src/components/form/Formfield'
@@ -10,11 +10,7 @@ import { TextfieldStatus } from '@/src/components/form/Textfield'
 import { withGenericSuspense } from '@/src/components/helpers/SafeSuspense'
 import { SimpleGrid } from '@/src/components/layout/SimpleGrid'
 import { TokenInput as BaseTokenInput } from '@/src/components/token/TokenInput'
-import { ZERO_BN } from '@/src/constants/bigNumber'
-import { useContractCall } from '@/src/hooks/useContractCall'
-import { useContractInstance } from '@/src/hooks/useContractInstance'
 import { useWeb3ConnectedApp } from '@/src/providers/web3ConnectionProvider'
-import { ERC20__factory } from '@/types/generated/typechain'
 
 const CSSMaxWidth = css`
   min-width: 300px;
@@ -31,14 +27,16 @@ const Button = styled(TxButton)`
 
 type Props = {
   label: string
-  erc20Address: string // ERC20 address
-  spender: string // Spender address
-  spendAction: () => Promise<ContractTransaction> // action like deposit, withdraw, borrow, etc
+  erc20Address: `0x${string}` // ERC20 address
+  spender: `0x${string}` // Spender address
+  spendAction: () => Promise<TransactionReceipt> // action like deposit, withdraw, borrow, etc
   erc20Info?: {
     symbol: string
     decimals: number
   }
 }
+
+const zero = BigInt(0)
 
 const TokenSpend = ({ erc20Address, erc20Info, label, spendAction, spender }: Props) => {
   const { address } = useWeb3ConnectedApp()
@@ -47,28 +45,36 @@ const TokenSpend = ({ erc20Address, erc20Info, label, spendAction, spender }: Pr
   const [tokenInputStatus, setTokenInputStatus] = useState<TextfieldStatus>()
   const [tokenInputStatusText, setTokenInputStatusText] = useState<string | undefined>()
 
-  const erc20 = useContractInstance(ERC20__factory, erc20Address)
+  const erc20 = {
+    address: erc20Address,
+    abi: erc20Abi,
+  } as const
 
-  const calls = [erc20.decimals, erc20.symbol, erc20.balanceOf, erc20.allowance] as const
-  const [{ data }, refetch] = useContractCall(
-    calls,
-    [[], [], [address], [address, spender]],
-    erc20Info ? null : `erc20Spend-token-data-${address}`,
-  )
+  const { writeContractAsync } = useWriteContract()
+  const { data, refetch } = useReadContracts({
+    allowFailure: false,
+    contracts: [
+      { ...erc20, functionName: 'decimals' },
+      { ...erc20, functionName: 'symbol' },
+      { ...erc20, functionName: 'balanceOf', args: [address] },
+      { ...erc20, functionName: 'allowance', args: [address ?? '0x0', spender] }, // TODO improve narrow address to not undefined
+    ],
+  })
 
-  if (!data?.length && !erc20Info) {
-    throw Error('Impossible to get token data')
-  }
+  console.log({ data, erc20Info })
+  // TODO is undefined on first run. Wagmi + suspense?
+  // if (!data?.length && !erc20Info) {
+  //   throw Error('Impossible to get token data')
+  // }
 
   const [decimals, symbol, balance, allowance] = data || [
-    erc20Info!.decimals,
-    erc20Info!.symbol,
-    ZERO_BN,
-    ZERO_BN,
+    erc20Info?.decimals ?? 18,
+    erc20Info?.symbol ?? 'ABC',
+    zero,
+    zero,
   ]
 
-  const disableSubmit =
-    tokenInputStatus === TextfieldStatus.error || BigNumber.from(value || ZERO_BN).eq(ZERO_BN)
+  const disableSubmit = tokenInputStatus === TextfieldStatus.error || BigInt(value) === zero
 
   return (
     <SimpleGrid alignItems="flex-start">
@@ -89,11 +95,17 @@ const TokenSpend = ({ erc20Address, erc20Info, label, spendAction, spender }: Pr
         status={tokenInputStatus}
         statusText={tokenInputStatusText}
       />
-      {allowance.lt(value || ZERO_BN) ? (
+      {allowance > BigInt(value) ? (
         <Button
           disabled={disableSubmit}
           onMined={() => refetch()}
-          tx={() => erc20.approve(spender, value)}
+          tx={async () => {
+            return writeContractAsync({
+              ...erc20,
+              functionName: 'approve',
+              args: [spender, BigInt(value)],
+            })
+          }}
         >
           Approve
         </Button>
@@ -102,7 +114,10 @@ const TokenSpend = ({ erc20Address, erc20Info, label, spendAction, spender }: Pr
           disabled={disableSubmit}
           onMined={() => refetch()}
           onSend={(tx) => tx && setValue('0')}
-          tx={() => spendAction()}
+          tx={async () => {
+            const hash = await spendAction()
+            return hash.transactionHash
+          }}
         >
           {label}
         </Button>

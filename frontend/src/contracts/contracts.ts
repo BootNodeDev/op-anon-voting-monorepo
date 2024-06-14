@@ -1,24 +1,27 @@
-import { Chains } from '@/src/config/web3'
-import ERC_20_abi from '@/src/contracts/abis/ERC20.json'
+import { Abi, Address, erc20Abi } from 'viem'
 
-export const contracts = {
-  DAI: {
-    address: {
-      // [Chains.mainnet]: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-      [Chains.goerli]: '0x5c221e77624690fff6dd741493d735a17716c26b',
-    },
-    abi: ERC_20_abi,
-  },
-  USDC: {
-    address: {
-      // [Chains.mainnet]: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      [Chains.goerli]: '0x78dEca24CBa286C0f8d56370f5406B48cFCE2f86',
-    },
-    abi: ERC_20_abi,
-  },
-} as const
+import { ChainNames } from '../config/wagmi'
+import ERC_20_abi from '@/src/contracts/abis/ERC20.abi'
 
-export type ContractsKeys = keyof typeof contracts
+export type ContractsKeys = 'DAI' | 'USDC'
+
+export const contracts: Record<ContractsKeys, { address: Record<ChainNames, Address>; abi: Abi }> =
+  {
+    DAI: {
+      address: {
+        'OP Mainnet': '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
+        'OP Sepolia': '0x0091f4e75a03C11cB9be8E3717219005eb780D89',
+      },
+      abi: ERC_20_abi, // Left as an example of custom abi
+    },
+    USDC: {
+      address: {
+        'OP Mainnet': '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
+        'OP Sepolia': '0x87350147a24099Bf1e7E677576f01C1415857C75', // TODO Check
+      },
+      abi: erc20Abi,
+    },
+  } as const
 
 export const isKnownContract = (
   contractName: ContractsKeys | string,

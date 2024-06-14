@@ -2,8 +2,8 @@ import { FC, PropsWithChildren, createContext, useContext } from 'react'
 
 import useSWR from 'swr'
 
+import { TokensLists } from '../config/tokenLists'
 import { withGenericSuspense } from '@/src/components/helpers/SafeSuspense'
-import { TokensLists } from '@/src/config/web3'
 import {
   Token,
   TokenListResponse,
@@ -18,6 +18,13 @@ type TokenListQueryReturn = {
   tokensByAddress: TokensByAddress
   tokensBySymbol: TokensBySymbol
   tokensByNetwork: TokensByNetwork
+}
+
+const initialTokenQueryValue = {
+  tokens: [],
+  tokensByAddress: {},
+  tokensBySymbol: {},
+  tokensByNetwork: {},
 }
 
 const useTokenListQuery = () => {
@@ -57,12 +64,7 @@ const useTokenListQuery = () => {
 
         return acc
       },
-      {
-        tokens: [],
-        tokensByAddress: {},
-        tokensBySymbol: {},
-        tokensByNetwork: {},
-      },
+      initialTokenQueryValue,
     )
     return {
       tokens: tokens.sort((a, b) => a.symbol.localeCompare(b.symbol)),
@@ -73,8 +75,7 @@ const useTokenListQuery = () => {
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TokenIconsContext = createContext<TokenListQueryReturn>({} as any)
+const TokenIconsContext = createContext<TokenListQueryReturn>(initialTokenQueryValue)
 
 export const TokenIconsContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const { data } = useTokenListQuery()
