@@ -1,5 +1,5 @@
 import { createConfig, http } from 'wagmi'
-import { optimism, optimismSepolia } from 'wagmi/chains'
+import { anvil, optimism, optimismSepolia } from 'wagmi/chains'
 
 declare module 'wagmi' {
   interface Register {
@@ -7,13 +7,14 @@ declare module 'wagmi' {
   }
 }
 
-export const chains = [optimism, optimismSepolia] as const
+export const chains = [optimism, optimismSepolia, anvil] as const
 
 export const config = createConfig({
   chains,
   transports: {
     [optimism.id]: http(),
     [optimismSepolia.id]: http(),
+    [anvil.id]: http('http://127.0.0.1:8545'),
   },
 })
 
@@ -26,6 +27,7 @@ export type ChainNames = (typeof chainNames)[number]
 export const mapId2Name: Record<ChainIds, ChainNames> = {
   10: 'OP Mainnet',
   11155420: 'OP Sepolia',
+  31337: 'Anvil',
 } as const
 
-export const chainIdsArray = ['10', '11155420'] as const
+export const chainIdsArray = ['10', '11155420', '31337'] as const

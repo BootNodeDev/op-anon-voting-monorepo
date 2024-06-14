@@ -1,5 +1,5 @@
 import { numberToHex } from 'viem'
-import { optimism, optimismSepolia } from 'viem/chains'
+import { anvil, optimism, optimismSepolia } from 'viem/chains'
 
 import { getProviderUrl } from './providers'
 import { ChainNames } from './wagmi'
@@ -22,6 +22,13 @@ export const chainsConfig: Record<ChainNames, ChainConfig> = {
     rpcUrl: getProviderUrl('OP Mainnet'),
     token: optimism.nativeCurrency.symbol,
     blockExplorerUrls: [optimism.blockExplorers.default.url, 'https://optimistic.etherscan.io'],
+  },
+  Anvil: {
+    ...anvil,
+    chainIdHex: numberToHex(anvil.id),
+    rpcUrl: anvil.rpcUrls.default.http[0],
+    token: anvil.nativeCurrency.symbol,
+    blockExplorerUrls: [],
   },
 }
 
