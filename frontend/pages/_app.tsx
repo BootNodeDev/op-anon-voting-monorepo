@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { ReactElement, ReactNode } from 'react'
 import styled from 'styled-components'
 
+import { ApolloProvider } from '@apollo/client'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { GoogleAnalytics } from 'nextjs-google-analytics'
 import { SWRConfig } from 'swr'
@@ -15,6 +16,7 @@ import SafeSuspense from '@/src/components/helpers/SafeSuspense'
 import { Footer } from '@/src/components/layout/Footer'
 import { Main } from '@/src/components/layout/Main'
 import Toast from '@/src/components/toast/Toast'
+import { apolloClient } from '@/src/config/apollo'
 import { queryClient } from '@/src/config/query'
 import { config } from '@/src/config/wagmi'
 import { Head } from '@/src/pagePartials/index/Head'
@@ -58,18 +60,20 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <WagmiProvider config={config}>
           <Web3ConnectionProvider>
             <QueryClientProvider client={queryClient}>
-              <ThemeProvider>
-                <SafeSuspense>
-                  <TransactionNotificationProvider>
-                    <CookiesWarningProvider>
-                      <Header />
-                      <Container>{getLayout(<Component {...pageProps} />)}</Container>
-                      <Footer />
-                    </CookiesWarningProvider>
-                  </TransactionNotificationProvider>
-                </SafeSuspense>
-                <Toast />
-              </ThemeProvider>
+              <ApolloProvider client={apolloClient}>
+                <ThemeProvider>
+                  <SafeSuspense>
+                    <TransactionNotificationProvider>
+                      <CookiesWarningProvider>
+                        <Header />
+                        <Container>{getLayout(<Component {...pageProps} />)}</Container>
+                        <Footer />
+                      </CookiesWarningProvider>
+                    </TransactionNotificationProvider>
+                  </SafeSuspense>
+                  <Toast />
+                </ThemeProvider>
+              </ApolloProvider>
             </QueryClientProvider>
           </Web3ConnectionProvider>
         </WagmiProvider>

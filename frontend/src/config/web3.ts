@@ -15,6 +15,7 @@ export const chainsConfig: Record<ChainNames, ChainConfig> = {
       optimismSepolia.blockExplorers.default.url,
       'https://sepolia-optimism.etherscan.io',
     ],
+    subgraphUri: process.env.NEXT_PUBLIC_SUBGRAPH_URI ?? '',
   },
   'OP Mainnet': {
     ...optimism,
@@ -22,6 +23,7 @@ export const chainsConfig: Record<ChainNames, ChainConfig> = {
     rpcUrl: getProviderUrl('OP Mainnet'),
     token: optimism.nativeCurrency.symbol,
     blockExplorerUrls: [optimism.blockExplorers.default.url, 'https://optimistic.etherscan.io'],
+    subgraphUri: process.env.NEXT_PUBLIC_SUBGRAPH_URI ?? '',
   },
   Anvil: {
     ...anvil,
@@ -29,6 +31,7 @@ export const chainsConfig: Record<ChainNames, ChainConfig> = {
     rpcUrl: anvil.rpcUrls.default.http[0],
     token: anvil.nativeCurrency.symbol,
     blockExplorerUrls: [],
+    subgraphUri: process.env.NEXT_PUBLIC_SUBGRAPH_URI ?? '',
   },
 }
 

@@ -10,9 +10,11 @@
     "lint:fix": "eslint --fix \"./**/*.{js,jsx,ts,tsx}\"",
     "prettier:fix": "prettier --write \"./**/*.{js,jsx,ts,tsx}\"",
     "wagmiGenerate": "yarn wagmi generate",
-    "start": "next start"
+    "start": "next start",
+    "generate": "graphql-codegen"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.5",
     "@semaphore-protocol/identity": "^3",
     "@semaphore-protocol/proof": "^3",
     "@tanstack/react-query": "^5.40.1",
@@ -23,6 +25,8 @@
     "@web3-onboard/react": "^2.5.3",
     "@web3-onboard/walletconnect": "^2.2.2",
     "big-number-input": "^1.0.3",
+    "graphql": "^16.8.2",
+    "graphql-codegen": "^0.4.0",
     "lodash": "^4.17.21",
     "next": "^14",
     "nextjs-google-analytics": "^2.2.2",
@@ -43,6 +47,9 @@
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/client-preset": "^4.3.0",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
     "@next/bundle-analyzer": "^13.1.1",
     "@types/lodash": "^4.14.191",
     "@types/react": "^18.0.26",
