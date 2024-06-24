@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 
 import { Identity } from '@semaphore-protocol/identity'
+import { Address } from 'viem'
 import { useSignMessage, useWriteContract } from 'wagmi'
 
 import { contracts } from '../contracts/contracts'
@@ -8,13 +9,14 @@ import { useWeb3Connection } from '../providers/web3ConnectionProvider'
 
 import { Maybe } from '@/types/utils'
 
+// TODO Use current chain
 const anonVoting = {
-  address: contracts['AnonVoting']['address'].Anvil,
+  address: contracts['AnonVoting']['address']['OP Mainnet'],
   abi: contracts['AnonVoting'].abi,
 } as const
 
 const MESSAGE = 'BOOT_NODE_ANON_VOTING'
-const POLL_ID = 1
+const POLL_ID = 1 // TODO Receive as parameter on hook
 const MT_DEPTH = 16
 const PASSWORD = ''
 
@@ -24,22 +26,21 @@ export const useIdentity = () => {
   const { writeContractAsync } = useWriteContract() // Replace after etherscan verification
   const [identity, setIdentity] = useState<Maybe<Identity>>(null)
 
-  const createPoll = useCallback(
-    async () =>
-      await writeContractAsync({
-        ...anonVoting,
-        functionName: 'createPoll',
-        args: [POLL_ID, address, MT_DEPTH],
-      }),
-    [address, writeContractAsync],
-  )
+  const createPoll = useCallback(async () => {
+    if (!address) return
+    await writeContractAsync({
+      ...anonVoting,
+      functionName: 'createPoll',
+      args: [BigInt(POLL_ID), address, BigInt(MT_DEPTH)],
+    })
+  }, [address, writeContractAsync])
 
   const startPoll = useCallback(
     async () =>
       await writeContractAsync({
         ...anonVoting,
         functionName: 'startPoll',
-        args: [POLL_ID, PASSWORD],
+        args: [BigInt(POLL_ID), BigInt(PASSWORD)],
       }),
     [writeContractAsync],
   )
@@ -61,18 +62,20 @@ export const useIdentity = () => {
   )
 
   const addVoter = useCallback(
-    async (commitment: string, uid: string) =>
+    async (commitment: string, uid: Address) => {
+      console.log({ commitment, uid })
       await writeContractAsync({
         ...anonVoting,
         functionName: 'addVoter',
-        args: [POLL_ID, commitment, uid],
+        args: [BigInt(POLL_ID), BigInt(commitment), uid],
       })
         .then((hash) => {
           console.log({ voterAddedHash: hash })
         })
         .catch((e) => {
           console.error(e)
-        }),
+        })
+    },
     [writeContractAsync],
   )
 

@@ -43,7 +43,19 @@ const Home: NextPage = () => {
             <Button onClick={() => createIdentity()}>Generate identity</Button>
             <Button onClick={() => createPoll()}>Create Poll</Button>
             <Button onClick={() => startPoll()}>Start Poll</Button>
-            <Button onClick={() => addVoter('', '')}>Add Voter</Button>
+            <Button
+              disabled={identity === null || data === undefined}
+              onClick={() =>
+                identity !== null &&
+                data &&
+                addVoter(
+                  identity.getCommitment().toString(),
+                  data?.attestations[0].id as `0x${string}`,
+                )
+              }
+            >
+              Add Voter
+            </Button>
           </BaseParagraph>
         )}
       </Card>
