@@ -1,8 +1,9 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Identity } from '@semaphore-protocol/identity'
+import { generateProof } from '@semaphore-protocol/proof'
 import { Address } from 'viem'
-import { useSignMessage, useWriteContract } from 'wagmi'
+import { useReadContract, useSignMessage, useWriteContract } from 'wagmi'
 
 import { contracts } from '../contracts/contracts'
 import { useWeb3Connection } from '../providers/web3ConnectionProvider'
@@ -15,39 +16,67 @@ const anonVoting = {
 } as const
 
 const MESSAGE = 'BOOT_NODE_ANON_VOTING'
-const POLL_ID = 1 // TODO Receive as parameter on hook
 const MT_DEPTH = 16
 const PASSWORD = ''
 
-export const useIdentity = () => {
+export const useIdentity = (pollIdProp: bigint) => {
   const { address } = useWeb3Connection()
+  const [pollId, setPollId] = useState(pollIdProp)
+
   const { signMessage } = useSignMessage()
-  const { writeContractAsync } = useWriteContract() // Replace after etherscan verification
+  const { data: mkTreeRoot } = useReadContract({
+    abi: anonVoting.abi,
+    address: anonVoting.address,
+    functionName: 'getMerkleTreeRoot',
+    args: [pollId],
+  })
+  console.log({ mkTreeRoot })
+  const { writeContractAsync } = useWriteContract() // TODO Replace with hooks after etherscan verification
   const [identity, setIdentity] = useState<Maybe<Identity>>(null)
 
-  const createPoll = useCallback(async () => {
-    if (!address) return
-    await writeContractAsync({
-      ...anonVoting,
-      functionName: 'createPoll',
-      args: [BigInt(POLL_ID), address, BigInt(MT_DEPTH)],
-    })
-  }, [address, writeContractAsync])
+  useEffect(() => {
+    setPollId(pollIdProp)
+  }, [pollIdProp])
+
+  // TODO Receive some state values of the poll
+
+  const makeProof = useCallback(
+    async (vote: bigint) => {
+      if (!identity) throw Error('no identity')
+      // group, externalNullifier
+      const externalNullifier = pollId
+      const proof = await generateProof(identity, mkTreeRoot, externalNullifier, vote)
+
+      return proof
+    },
+    [identity, mkTreeRoot, pollId],
+  )
+
+  const createPoll = useCallback(
+    async (coordinator: Address) => {
+      await writeContractAsync({
+        ...anonVoting,
+        functionName: 'createPoll',
+        args: [BigInt(pollId), coordinator, BigInt(MT_DEPTH)],
+      })
+    },
+    [pollId, writeContractAsync],
+  )
 
   const startPoll = useCallback(
     async () =>
       await writeContractAsync({
         ...anonVoting,
         functionName: 'startPoll',
-        args: [BigInt(POLL_ID), BigInt(PASSWORD)],
+        args: [BigInt(pollId), BigInt(PASSWORD)],
       }),
-    [writeContractAsync],
+    [pollId, writeContractAsync],
   )
 
   const createIdentity = useCallback(
-    async () =>
+    async (message = MESSAGE) =>
       await signMessage(
-        { account: address, message: MESSAGE },
+        { account: address, message },
         {
           onSuccess: (data) => {
             console.log(data)
@@ -66,7 +95,7 @@ export const useIdentity = () => {
       await writeContractAsync({
         ...anonVoting,
         functionName: 'addVoter',
-        args: [BigInt(POLL_ID), BigInt(commitment), uid],
+        args: [BigInt(pollId), BigInt(commitment), uid],
       })
         .then((hash) => {
           console.log({ voterAddedHash: hash })
@@ -75,10 +104,40 @@ export const useIdentity = () => {
           console.error(e)
         })
     },
-    [writeContractAsync],
+    [pollId, writeContractAsync],
   )
 
-  // const tx = useTransaction()
+  const endPoll = useCallback(async () => {
+    await writeContractAsync({
+      ...anonVoting,
+      functionName: 'endPoll',
+      args: [BigInt(pollId), BigInt(PASSWORD)],
+    })
+      .then((hash) => {
+        console.log({ voterAddedHash: hash })
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }, [pollId, writeContractAsync])
 
-  return { identity, createIdentity, createPoll, addVoter, startPoll }
+  const castVote = useCallback(
+    async (vote: number) => {
+      const proof = await makeProof(BigInt(vote))
+      await writeContractAsync({
+        ...anonVoting,
+        functionName: 'castVote',
+        args: [proof.signal, proof.nullifierHash, proof.externalNullifier, proof.proof],
+      })
+        .then((hash) => {
+          console.log({ voterAddedHash: hash })
+        })
+        .catch((e) => {
+          console.error(e)
+        })
+    },
+    [makeProof, writeContractAsync],
+  )
+
+  return { identity, createIdentity, createPoll, addVoter, startPoll, endPoll, castVote }
 }

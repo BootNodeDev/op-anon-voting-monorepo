@@ -81,5 +81,8 @@
       "prettier --write",
       "bash -c tsc"
     ]
+  },
+  "resolutions": {
+    "web-worker": "1.2.0"
   }
 }
