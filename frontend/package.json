@@ -11,7 +11,8 @@
     "prettier:fix": "prettier --write \"./**/*.{js,jsx,ts,tsx}\"",
     "wagmiGenerate": "yarn wagmi generate",
     "start": "next start",
-    "generate": "graphql-codegen"
+    "generate": "graphql-codegen",
+    "postinstall": "yarn generate"
   },
   "dependencies": {
     "@apollo/client": "^3.10.5",

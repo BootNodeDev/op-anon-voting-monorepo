@@ -1,7 +1,4 @@
-import { Abi, Address } from 'viem'
-
 import AnonVotingAbi from './abis/AnonVoting.abi'
-import { ChainNames } from '../config/wagmi'
 import { ZERO_ADDRESS } from '../constants/bigNumber'
 
 export type ContractsKeys = 'AnonVoting'
