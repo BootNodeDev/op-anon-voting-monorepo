@@ -27,7 +27,6 @@
     "@web3-onboard/walletconnect": "^2.2.2",
     "big-number-input": "^1.0.3",
     "graphql": "^16.8.2",
-    "graphql-codegen": "^0.4.0",
     "lodash": "^4.17.21",
     "next": "^14",
     "nextjs-google-analytics": "^2.2.2",
