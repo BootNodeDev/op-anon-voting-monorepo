@@ -7,11 +7,12 @@ import { useReadContract, useSignMessage, useWriteContract } from 'wagmi'
 
 import { contracts } from '../contracts/contracts'
 import { useWeb3Connection } from '../providers/web3ConnectionProvider'
+
 import { Maybe } from '@/types/utils'
 
 // TODO Use current chain
 const anonVoting = {
-  address: contracts['AnonVoting']['address']['OP Mainnet'],
+  address: contracts['AnonVoting']['address']['OP Mainnet'] as Address,
   abi: contracts['AnonVoting'].abi,
 } as const
 
@@ -26,7 +27,7 @@ export const useIdentity = (pollIdProp: bigint) => {
   const { signMessage } = useSignMessage()
   const { data: mkTreeRoot } = useReadContract({
     abi: anonVoting.abi,
-    address: anonVoting.address,
+    address: anonVoting.address as Address,
     functionName: 'getMerkleTreeRoot',
     args: [pollId],
   })

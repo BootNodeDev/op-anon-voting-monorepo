@@ -78,6 +78,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const att = easSubgraphData?.attestations[0]
+    console.log({ att })
     const newUid = att && att.id && att.recipient === address ? att.id : null
 
     setUid(newUid as ViemAddress)
@@ -104,13 +105,13 @@ const Home: NextPage = () => {
             />
             <DataInput id="poll-id" label="Poll ID" onChange={setPollId} value={pollId} />
             <Button onClick={() => createPoll(coordinator)}>Create Poll</Button>
-            <Button onClick={() => startPoll()}>Start Poll</Button>
             <Button
               disabled={identity === null || uid === null}
               onClick={() => identity && uid && addVoter(identity.getCommitment().toString(), uid)}
             >
               Add Voter
             </Button>
+            <Button onClick={() => startPoll()}>Start Poll</Button>
             <DataInput id="vote" label="Vote" onChange={setVote} value={vote} />
             <Button onClick={() => castVote(+vote)}>Cast Vote</Button>
             <Button onClick={() => endPoll()}>End Poll</Button>
