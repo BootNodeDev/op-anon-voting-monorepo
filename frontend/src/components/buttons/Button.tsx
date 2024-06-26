@@ -40,20 +40,19 @@ export const ActiveButtonCSS = css`
 // General button styles
 export const ButtonCSS = css<ButtonProps>`
   align-items: center;
-  border-radius: 5px;
+  border-radius: 2px;
   border-style: solid;
   border-width: 1px;
-  column-gap: 10px;
+  column-gap: 8px;
   cursor: pointer;
   display: flex;
   font-family: ${({ theme: { fonts } }) => fonts.family};
   font-size: 1.6rem;
   font-weight: 400;
-  height: 38px;
   justify-content: center;
   line-height: 1;
   outline: none;
-  padding: 0 18px;
+  padding: 8px 16px;
   text-align: center;
   text-decoration: none;
   transition: all 0.15s ease-out;
