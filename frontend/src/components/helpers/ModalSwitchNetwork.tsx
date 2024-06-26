@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 
+import { Button } from '@/src/components/buttons/Button'
 import { Modal } from '@/src/components/common/Modal'
 import { ChainIds } from '@/src/config/wagmi'
 import { chainsConfig } from '@/src/config/web3'
@@ -11,20 +12,13 @@ const NetworkButtons = styled.div`
   flex-direction: column;
   justify-content: center;
   min-height: 200px;
-  padding: 0 20px;
-  row-gap: 20px;
+  row-gap: 8px;
   width: 100%;
 `
 
-const NetworkButton = styled.button`
-  background-color: transparent;
-  border: 1px solid ${({ theme: { colors } }) => colors.lightGreen};
-  border-radius: 3px;
-  color: ${({ theme: { colors } }) => colors.lightGreen};
-  cursor: pointer;
-  font-size: 1.5rem;
-  height: 30px;
+const NetworkButton = styled(Button)`
   width: 100%;
+  padding: 16px;
 
   &:active {
     opacity: 0.7;
