@@ -20,6 +20,8 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => uint256) public encryptionKey;
     mapping(uint256 => uint256) public decryptionKey;
 
+    mapping(uint256 => uint256[]) internal _votes;
+
     constructor(ISemaphoreVerifier _verifier) SemaphoreVoting(_verifier) { }
 
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
@@ -55,5 +57,14 @@ contract AnonVoting is SemaphoreVoting {
     function endPoll(uint256 pollId, uint256 _decryptionKey) public override onlyCoordinator(pollId) {
         super.endPoll(pollId, _decryptionKey);
         decryptionKey[pollId] = _decryptionKey;
+    }
+
+    function castVote(uint256 vote, uint256 nullifierHash, uint256 pollId, uint256[8] calldata proof) public override {
+        super.castVote(vote, nullifierHash, pollId, proof);
+        _votes[pollId].push(vote);
+    }
+
+    function votes(uint256 pollId) public view returns (uint256[] memory) {
+        return _votes[pollId];
     }
 }

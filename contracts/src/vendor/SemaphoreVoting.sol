@@ -70,7 +70,7 @@ contract SemaphoreVoting is ISemaphoreVoting, SemaphoreGroups {
     }
 
     /// @dev See {ISemaphoreVoting-castVote}.
-    function castVote(uint256 vote, uint256 nullifierHash, uint256 pollId, uint256[8] calldata proof) public override {
+    function castVote(uint256 vote, uint256 nullifierHash, uint256 pollId, uint256[8] calldata proof) public virtual override {
         if (polls[pollId].state != PollState.Ongoing) {
             revert Semaphore__PollIsNotOngoing();
         }
