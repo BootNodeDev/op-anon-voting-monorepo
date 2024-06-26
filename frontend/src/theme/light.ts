@@ -12,6 +12,7 @@ const tertiary = '#A6CFD5'
 const textColor = '#152445'
 const borderColor =  rgba(textColor, 0.1)
 const gray = '#909AB2'
+const lighterGray = '#F3F3F3'
 const lightestGray = '#F7F8FC'
 const darkGray = '#7E8AA5'
 const darkGrayDarkened = darken(0.1, '#fff')
@@ -27,7 +28,7 @@ export const light = {
   },
   button: {
     dropdown: {
-      backgroundColor: '#fff',
+      backgroundColor: white,
       backgroundColorHover: darkGrayDarkened,
       borderColor: borderColor,
       borderColorHover: borderColor,
@@ -65,6 +66,7 @@ export const light = {
     borderColor: borderColor,
     componentBackgroundColor: componentBackgroundColor,
     darkBlue: darkBlue,
+    lighterGray: lighterGray,
     lightestGray: lightestGray,
     gray: gray,
     darkGray: darkGray,
@@ -75,6 +77,7 @@ export const light = {
     success: success,
     tertiary: tertiary,
     textColor: textColor,
+    white: white,
   },
   dropdown: {
     background: '#fff',
@@ -82,11 +85,11 @@ export const light = {
     boxShadow: 'none',
     item: {
       backgroundColor: 'transparent',
-      backgroundColorHover: darkGrayDarkened,
+      backgroundColorHover: lightestGray,
       borderColor: borderColor,
       color: textColor,
       colorDanger: error,
-      colorHover: textColor,
+      colorHover: primary,
       colorOK: success,
     },
   },

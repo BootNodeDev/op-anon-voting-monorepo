@@ -39,6 +39,6 @@ export const Dropdown = styled(BaseDropdown)`
     border-top-right-radius: 0;
     border: none;
     padding: 0;
-    top: 100%;
+    top: 110%;
   }
 `

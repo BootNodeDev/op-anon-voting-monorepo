@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { Button } from '@/src/components/buttons/Button'
@@ -54,12 +54,7 @@ const UserControls = styled.div`
 `
 
 export const Header: React.FC = (props) => {
-  const { connectWallet, isWalletConnected, isWalletNetworkSupported } = useWeb3Connection()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  const { connectWallet, isWalletConnected } = useWeb3Connection()
 
   return (
     <>

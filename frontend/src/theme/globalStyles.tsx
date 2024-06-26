@@ -35,7 +35,9 @@ export const GlobalStyles = createGlobalStyle<{ theme?: any }>`
   }
     }
   }
-
+  button{
+    font-family: ${({ theme: { fonts } }) => fonts.family} !important;
+  }
   code {
     font-family: ${({ theme: { fonts } }) => fonts.familyCode};
   }
