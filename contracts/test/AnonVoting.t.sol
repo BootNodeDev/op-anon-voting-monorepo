@@ -6,6 +6,7 @@ import { Test } from "forge-std/src/Test.sol";
 import { console2 } from "forge-std/src/console2.sol";
 
 import { SemaphoreVerifier } from "semaphore/base/SemaphoreVerifier.sol";
+import { ISemaphoreVoting } from "src/vendor/SemaphoreVoting.sol";
 
 import { IEAS, Attestation } from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
@@ -13,21 +14,25 @@ import { AnonVoting } from "src/AnonVoting.sol";
 
 import { EAS } from "src/constants.sol";
 
-contract AnonVotingTest is Test {
+import { Constants } from "test/Constants.sol";
+
+contract AnonVotingTest is Test, Constants {
     SemaphoreVerifier public verifier;
     AnonVoting public anonVoting;
 
     address internal immutable COORDINATOR = makeAddr("coordinator");
 
-    bytes32 internal constant REAL_UID = 0xe9d4e5a14ec840656d9def34075d9523d1536176d5f0a7d574f2e93bea641b66;
-    bytes32 internal constant FAKE_UID = 0x95f6eaa137853e15e93bd6e0b3d62a28529a5b04aa0ea5d2092bb7764464c812;
-
     uint256 internal pollId = 1;
-    uint256 internal identityCommitment = 42;
+    // generated from the string "super-secret-string"
+    uint256 internal identityCommitment =
+        15_496_707_633_537_264_750_768_393_125_461_693_718_536_245_296_054_813_987_456_368_988_786_470_942_619;
+
+    uint256 internal encryptionKey = 12_345;
+    uint256 internal decryptionKey = 67_890;
 
     IEAS internal eas = IEAS(EAS);
 
-    function setUp() public {
+    function setUp() public virtual {
         vm.createSelectFork("optimism", 120_069_420);
 
         verifier = new SemaphoreVerifier();
@@ -89,4 +94,58 @@ contract AddVoter is AnonVotingTest {
     }
 
     event MemberAdded(uint256 indexed groupId, uint256 index, uint256 identityCommitment, uint256 merkleTreeRoot);
+}
+
+contract StartPoll is AnonVotingTest {
+    function test_StoresEncryptionKey() public {
+        vm.prank(COORDINATOR);
+        anonVoting.startPoll(pollId, encryptionKey);
+
+        assertEq(anonVoting.encryptionKey(pollId), encryptionKey);
+    }
+
+    function test_RevertWhen_NotCalledByCoordinator() public {
+        vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
+        anonVoting.startPoll(pollId, encryptionKey);
+    }
+}
+
+contract EndPoll is AnonVotingTest {
+    function setUp() public override {
+        super.setUp();
+
+        vm.prank(COORDINATOR);
+        anonVoting.startPoll(pollId, encryptionKey);
+    }
+
+    function test_StoresDecryptionKey() public {
+        vm.prank(COORDINATOR);
+        anonVoting.endPoll(pollId, decryptionKey);
+
+        assertEq(anonVoting.decryptionKey(pollId), decryptionKey);
+    }
+
+    function test_RevertWhen_NotCalledByCoordinator() public {
+        vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
+        anonVoting.endPoll(pollId, decryptionKey);
+    }
+}
+
+contract CastVote is AnonVotingTest {
+    function setUp() public override {
+        super.setUp();
+
+        Attestation memory att = eas.getAttestation(REAL_UID);
+        vm.prank(att.recipient);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+
+        vm.prank(COORDINATOR);
+        anonVoting.startPoll(pollId, encryptionKey);
+    }
+
+    function test_StoresVote() public {
+        anonVoting.castVote(vote, nullifierHash, pollId, proof);
+        assertEq(anonVoting.votes(pollId).length, 1);
+        assertEq(anonVoting.votes(pollId)[0], vote);
+    }
 }
