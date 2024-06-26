@@ -1,7 +1,10 @@
 import { useCallback } from 'react'
 
-import { ContractTransaction } from '@ethersproject/contracts'
+import { Client } from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
+import { usePublicClient } from 'wagmi'
 
+import { ContractTransaction } from '../components/buttons/ContractTransaction'
 import { useTransactionNotification } from '@/src/providers/TransactionNotificationProvider'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { TransactionError } from '@/src/utils/TransactionError'
@@ -15,10 +18,12 @@ export default function useTransaction() {
     notifyWaitingForTxMined,
   } = useTransactionNotification()
 
+  const client: Client = usePublicClient()
+
   const waitForTxExecution = useCallback(
-    (tx: ContractTransaction) => {
-      notifyWaitingForTxMined(tx.hash)
-      tx.wait()
+    (hash: `0x${string}`) => {
+      notifyWaitingForTxMined(hash)
+      waitForTransactionReceipt(client, { hash })
         .then((r) => notifyTxMined(r.transactionHash, true))
         .catch((e) => {
           const error = new TransactionError(
@@ -29,10 +34,10 @@ export default function useTransaction() {
 
           console.error(error)
 
-          notifyTxMined(tx.hash)
+          notifyTxMined(hash)
         })
     },
-    [notifyTxMined, notifyWaitingForTxMined],
+    [client, notifyTxMined, notifyWaitingForTxMined],
   )
 
   return useCallback(
@@ -42,11 +47,12 @@ export default function useTransaction() {
       }
       try {
         notifyWaitingForSignature()
-        const receipt = await methodToCall()
-        if (receipt) waitForTxExecution(receipt)
-        return receipt
+        const hash = await methodToCall()
+        if (hash) waitForTxExecution(hash)
+        return hash
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
+        // TODO Should we check for `status`?
         console.error(e)
         const error = new TransactionError(
           e.data?.message || e.message || 'Unable to decode revert reason',

@@ -10,12 +10,12 @@ import { OPTIMISM_ATTESTER, EAS } from "src/constants.sol";
 
 contract AnonVoting is SemaphoreVoting {
     error InvalidAttestation(string message);
-    error AlreadyRegistered(address voter);
+    error AlreadyEnrolled(address voter, uint256 pollId);
     error SelfEnrollmentOnly();
 
     IEAS internal eas = IEAS(EAS);
 
-    mapping(address => bool) internal alreadyRegistered;
+    mapping(uint256 => mapping(address => bool)) internal enrolled;
 
     mapping(uint256 => uint256) public encryptionKey;
     mapping(uint256 => uint256) public decryptionKey;
@@ -27,13 +27,13 @@ contract AnonVoting is SemaphoreVoting {
 
         if (att.attester != OPTIMISM_ATTESTER) revert InvalidAttestation("Not from trusted attester");
         if (att.recipient != msg.sender) revert InvalidAttestation("Does not belong to voter");
-        if (alreadyRegistered[msg.sender]) revert AlreadyRegistered(msg.sender);
+        if (enrolled[pollId][msg.sender]) revert AlreadyEnrolled(msg.sender, pollId);
 
         if (polls[pollId].state != PollState.Created) {
             revert Semaphore__PollHasAlreadyBeenStarted();
         }
 
-        alreadyRegistered[msg.sender] = true;
+        enrolled[pollId][msg.sender] = true;
 
         _addMember(pollId, identityCommitment);
     }

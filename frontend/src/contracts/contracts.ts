@@ -1,24 +1,22 @@
-import { Chains } from '@/src/config/web3'
-import ERC_20_abi from '@/src/contracts/abis/ERC20.json'
+import { Abi, Address } from 'viem'
 
-export const contracts = {
-  DAI: {
-    address: {
-      // [Chains.mainnet]: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-      [Chains.goerli]: '0x5c221e77624690fff6dd741493d735a17716c26b',
-    },
-    abi: ERC_20_abi,
-  },
-  USDC: {
-    address: {
-      // [Chains.mainnet]: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      [Chains.goerli]: '0x78dEca24CBa286C0f8d56370f5406B48cFCE2f86',
-    },
-    abi: ERC_20_abi,
-  },
-} as const
+import AnonVotingAbi from './abis/AnonVoting.abi'
+import { ChainNames } from '../config/wagmi'
+import { ZERO_ADDRESS } from '../constants/bigNumber'
 
-export type ContractsKeys = keyof typeof contracts
+export type ContractsKeys = 'AnonVoting'
+
+export const contracts: Record<ContractsKeys, { address: Record<ChainNames, Address>; abi: Abi }> =
+  {
+    AnonVoting: {
+      address: {
+        'OP Mainnet': ZERO_ADDRESS, // TODO deploy
+        'OP Sepolia': ZERO_ADDRESS, // TODO deploy,
+        Anvil: '0xdc64a140aa3e981100a9beca4e685f962f0cf6c9',
+      },
+      abi: AnonVotingAbi, // Left as an example of custom abi
+    },
+  } as const
 
 export const isKnownContract = (
   contractName: ContractsKeys | string,

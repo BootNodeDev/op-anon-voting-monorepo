@@ -1,6 +1,7 @@
 import styled, { keyframes } from 'styled-components'
 
 import { Button } from '@/src/components/buttons/Button'
+import { mapId2Name } from '@/src/config/wagmi'
 import { getNetworkConfig } from '@/src/config/web3'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 
@@ -36,7 +37,7 @@ const Content = styled.div`
 export default function WrongNetwork() {
   const { appChainId, isWalletConnected, isWalletNetworkSupported, pushNetwork } =
     useWeb3Connection()
-  const appChain = getNetworkConfig(appChainId)
+  const appChain = getNetworkConfig(mapId2Name[appChainId])
   return isWalletConnected && !isWalletNetworkSupported ? (
     <Button onClick={() => pushNetwork({ chainId: appChain.chainIdHex })}>
       <Content>Swich to valid network</Content>

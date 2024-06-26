@@ -9,34 +9,33 @@ import {
   useState,
 } from 'react'
 
-import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers'
-import { OnboardAPI, WalletState } from '@web3-onboard/core'
+import { OnboardAPI } from '@web3-onboard/core'
 import injectedModule from '@web3-onboard/injected-wallets'
 import { init, useConnectWallet, useSetChain, useWallets } from '@web3-onboard/react'
-// import walletConnectModule from '@web3-onboard/walletconnect'
-import nullthrows from 'nullthrows'
+import walletConnectModule from '@web3-onboard/walletconnect'
+import { createWalletClient, custom } from 'viem'
+import { useAccount } from 'wagmi'
+import { UseAccountReturnType } from 'wagmi'
 
-import { Chains, INITIAL_APP_CHAIN_ID, chainsConfig, getNetworkConfig } from '@/src/config/web3'
+import { ChainIds, chainIds, config, mapId2Name } from '../config/wagmi'
+import { chainsConfig, getNetworkConfig } from '@/src/config/web3'
 import { appName } from '@/src/constants/common'
 import {
   recoverLocalStorageKey,
   removeLocalStorageKey,
   setLocalStorageKey,
 } from '@/src/hooks/usePersistedState'
-import { hexToNumber } from '@/src/utils/strings'
-import { ChainConfig, ChainsValues } from '@/types/chains'
+import { ChainConfig } from '@/types/chains'
 import { RequiredNonNull } from '@/types/utils'
 
 const STORAGE_CONNECTED_WALLET = 'onboard_selectedWallet'
 
-// Default chain id from env var
-nullthrows(
-  Object.values(Chains).includes(INITIAL_APP_CHAIN_ID) ? INITIAL_APP_CHAIN_ID : null,
-  'No default chain ID is defined or is not supported',
-)
-
 const injected = injectedModule()
-// const walletConnect = walletConnectModule({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID })
+
+const walletConnect = walletConnectModule({
+  projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+  dappUrl: process.env.NEXT_PUBLIC_WC_DAPP_URL,
+})
 
 const chainsForOnboard = Object.values(chainsConfig).map(
   ({ chainIdHex, name, rpcUrl, token }: ChainConfig) => ({
@@ -53,7 +52,7 @@ export function initOnboard() {
   if (typeof window === 'undefined' || window?.onboard || onBoardApi) return
 
   onBoardApi = init({
-    wallets: [injected /*, walletConnect */],
+    wallets: [injected, walletConnect],
     chains: chainsForOnboard,
     notify: {
       enabled: false,
@@ -84,9 +83,9 @@ declare type SetChainOptions = {
 }
 
 export type Web3Context = {
-  address: string | null
-  appChainId: ChainsValues
-  balance?: Record<string, string> | null
+  address: UseAccountReturnType['address']
+  chainId: UseAccountReturnType<typeof config>['chainId']
+  appChainId: ChainIds
   connectWallet: () => Promise<void> | null
   connectingWallet: boolean
   disconnectWallet: () => Promise<void> | null
@@ -96,11 +95,7 @@ export type Web3Context = {
   isWalletConnected: boolean
   isWalletNetworkSupported: boolean
   pushNetwork: (options: SetChainOptions) => Promise<boolean>
-  readOnlyAppProvider: JsonRpcProvider
-  setAppChainId: Dispatch<SetStateAction<ChainsValues>>
-  wallet: WalletState | null
-  walletChainId: number | null
-  web3Provider: Web3Provider | null
+  setAppChainId: Dispatch<SetStateAction<ChainIds>>
 }
 
 export type Web3Connected = RequiredNonNull<Web3Context>
@@ -119,12 +114,18 @@ export default function Web3ConnectionProvider({ children }: Props) {
   const [{ chains, connectedChain, settingChain }, setChain] = useSetChain()
   const connectedWallets = useWallets()
 
-  const [appChainId, setAppChainId] = useState(INITIAL_APP_CHAIN_ID)
-  const [address, setAddress] = useState<string | null>(null)
+  const [appChainId, setAppChainId] = useState(chainIds[0])
 
-  const web3Provider = wallet?.provider != null ? new Web3Provider(wallet.provider) : null
+  // Expose address, addresses, chain, chainId, connector, isConnected, isConnecting, isDisconnected, isReconnecting, status
+  const { address, chainId: walletChainId } = useAccount({ config })
 
-  const walletChainId = hexToNumber(connectedChain?.id)
+  const web3Provider =
+    wallet?.provider != null
+      ? createWalletClient({
+          chain: getNetworkConfig(mapId2Name[appChainId]),
+          transport: custom(wallet.provider),
+        })
+      : null
 
   const isWalletConnected = web3Provider != null && address != null
 
@@ -132,14 +133,9 @@ export default function Web3ConnectionProvider({ children }: Props) {
 
   const isWalletNetworkSupported = chains.some(({ id }) => id === connectedChain?.id)
 
-  const readOnlyAppProvider = useMemo(
-    () => new JsonRpcProvider(getNetworkConfig(appChainId)?.rpcUrl, appChainId),
-    [appChainId],
-  )
-
   useEffect(() => {
     if (isWalletNetworkSupported && walletChainId) {
-      setAppChainId(walletChainId as SetStateAction<ChainsValues>)
+      setAppChainId(walletChainId as SetStateAction<ChainIds>)
     }
   }, [walletChainId, isWalletNetworkSupported])
 
@@ -150,15 +146,6 @@ export default function Web3ConnectionProvider({ children }: Props) {
     const connectedWalletsLabelArray = connectedWallets.map(({ label }) => label)
     setLocalStorageKey(STORAGE_CONNECTED_WALLET, connectedWalletsLabelArray)
   }, [connectedWallets, wallet])
-
-  // Set user address when connect wallet
-  useEffect(() => {
-    if (wallet) {
-      setAddress(wallet.accounts[0].address)
-    } else {
-      setAddress(null)
-    }
-  }, [wallet])
 
   // Auto connect wallet if localStorage has values
   useEffect(() => {
@@ -174,10 +161,10 @@ export default function Web3ConnectionProvider({ children }: Props) {
   }, [connect, chains, connectedWallets.length])
 
   const getExplorerUrl = useMemo(() => {
-    const url = chainsConfig[appChainId]?.blockExplorerUrls[0]
+    const url = chainsConfig[mapId2Name[appChainId]]?.blockExplorerUrls[0]
     return (hash: string) => {
       const type = hash.length > 42 ? 'tx' : 'address'
-      return `${url}${type}/${hash}`
+      return `${url}/${type}/${hash}`
     }
   }, [appChainId])
 
@@ -197,7 +184,7 @@ export default function Web3ConnectionProvider({ children }: Props) {
   const value = {
     address,
     appChainId,
-    balance: wallet?.accounts[0].balance,
+    chainId: walletChainId,
     connectWallet: handleConnectWallet,
     connectedChain,
     connectingWallet,
@@ -208,12 +195,8 @@ export default function Web3ConnectionProvider({ children }: Props) {
     isWalletConnected,
     isWalletNetworkSupported,
     pushNetwork: setChain,
-    readOnlyAppProvider,
     setAppChainId,
     settingChain,
-    wallet,
-    walletChainId,
-    web3Provider,
   }
 
   return <Web3ContextConnection.Provider value={value}>{children}</Web3ContextConnection.Provider>

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import styled from 'styled-components'
+import { ChangeEvent, useState } from 'react'
+import styled, { css } from 'styled-components'
 
 import { DebounceInput } from 'react-debounce-input'
 
@@ -29,12 +29,13 @@ const TextfieldContainer = styled.div`
   width: calc(100% + ${({ theme: { card } }) => card.paddingHorizontal} * 2);
 `
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Textfield: any = styled(DebounceInput)`
-  ${TextfieldCSS};
+const Textfield = styled(DebounceInput)`
+  ${css`
+    ${TextfieldCSS};
 
-  flex-shrink: 0;
-  width: 100%;
+    flex-shrink: 0;
+    width: 100%;
+  `}
 `
 
 const List = styled.div`
@@ -109,7 +110,7 @@ export const TokenModal: React.FC<{ onChange?: (token: Token | null) => void }> 
           <TextfieldContainer key="tokenSearchInput">
             <Textfield
               debounceTimeout={300}
-              onChange={(e: { target: { value: string } }) => setSearchString(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value)}
               placeholder="Search token..."
               type="search"
               value={searchString}

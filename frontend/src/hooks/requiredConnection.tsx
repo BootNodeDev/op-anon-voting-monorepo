@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react'
 import styled from 'styled-components'
 
+import { ChainNames, mapId2Name } from '../config/wagmi'
 import { Button } from '@/src/components/buttons/Button'
 import { chainsConfig } from '@/src/config/web3'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
-import { ChainsValues } from '@/types/chains'
 
 const Wrapper = styled.div`
   display: flex;
@@ -35,7 +35,7 @@ type RequiredConnectionProps = {
   minHeight?: number
   isNotConnectedText?: string
   isWrongNetworkText?: string
-  networkToCheck?: ChainsValues
+  networkToCheck?: ChainNames
 }
 
 const RequiredConnection: React.FC<RequiredConnectionProps> = ({
@@ -45,10 +45,10 @@ const RequiredConnection: React.FC<RequiredConnectionProps> = ({
   minHeight,
   ...restProps
 }) => {
-  const { address, appChainId, connectWallet, isWalletConnected, pushNetwork, walletChainId } =
+  const { address, appChainId, chainId, connectWallet, isWalletConnected, pushNetwork } =
     useWeb3Connection()
   const isConnected = isWalletConnected && address
-  const isWrongNetwork = isConnected && walletChainId !== appChainId
+  const isWrongNetwork = isConnected && chainId !== appChainId
 
   if (!isConnected) {
     return (
@@ -63,8 +63,10 @@ const RequiredConnection: React.FC<RequiredConnectionProps> = ({
     return (
       <Wrapper style={{ minHeight }} {...restProps}>
         {!!isWrongNetworkText.length && <TextBig>{isWrongNetworkText}</TextBig>}
-        <Button onClick={() => pushNetwork({ chainId: chainsConfig[appChainId].chainIdHex })}>
-          Switch to {chainsConfig[appChainId].name}
+        <Button
+          onClick={() => pushNetwork({ chainId: chainsConfig[mapId2Name[appChainId]].chainIdHex })}
+        >
+          Switch to {chainsConfig[mapId2Name[appChainId]].name}
         </Button>
       </Wrapper>
     )

@@ -113,7 +113,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   title?: string
 }
 
-export const Modal: React.FC<Props> = ({
+export const Modal = ({
   children,
   closeOnBackgroundClick = true,
   onClose,
@@ -139,29 +139,32 @@ export const Modal: React.FC<Props> = ({
   }, [onClose, onCloseIsAFunction])
 
   return (
-    portal &&
-    ReactDOM.createPortal(
-      <Wrapper
-        className="modal"
-        onClick={closeOnBackgroundClick ? onCloseModal : undefined}
-        {...restProps}
-      >
-        <Card
-          aria-describedby="modalDescription"
-          aria-labelledby="modalTitle"
-          className="modalCard"
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
-          role="dialog"
-          size={size}
-        >
-          {title && <Title id="modalTitle">{title}</Title>}
-          <Close onClick={onCloseModal} tabIndex={-1} />
-          <Contents id="modalDescription">{children}</Contents>
-        </Card>
-      </Wrapper>,
-      portal,
+    portal && (
+      <>
+        {ReactDOM.createPortal(
+          <Wrapper
+            className="modal"
+            onClick={closeOnBackgroundClick ? onCloseModal : undefined}
+            {...restProps}
+          >
+            <Card
+              aria-describedby="modalDescription"
+              aria-labelledby="modalTitle"
+              className="modalCard"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+              role="dialog"
+              size={size}
+            >
+              {title && <Title id="modalTitle">{title}</Title>}
+              <Close onClick={onCloseModal} tabIndex={-1} />
+              <Contents id="modalDescription">{children}</Contents>
+            </Card>
+          </Wrapper>,
+          portal,
+        )}
+      </>
     )
   )
 }

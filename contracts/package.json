@@ -33,6 +33,7 @@
     "build": "forge build",
     "lint": "forge fmt --check && bun solhint '{script,src,test}/**/*.sol'",
     "test": "forge test",
+    "local": "forge script script/Deploy.s.sol:Deploy --fork-url http://localhost:8545 --broadcast",
     "test:coverage": "forge coverage",
     "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage"
   }

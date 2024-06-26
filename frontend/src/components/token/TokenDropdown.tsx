@@ -1,4 +1,5 @@
-import styled from 'styled-components'
+import { ChangeEvent } from 'react'
+import styled, { css } from 'styled-components'
 
 import { DebounceInput } from 'react-debounce-input'
 
@@ -27,13 +28,14 @@ const TextfieldContainer = styled.div<{ closeOnClick?: boolean }>`
   z-index: 1;
 `
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Textfield: any = styled(DebounceInput)`
-  ${TextfieldCSS};
+const Textfield = styled(DebounceInput)`
+  ${css`
+    ${TextfieldCSS};
 
-  flex-shrink: 0;
-  max-width: 100%;
-  width: auto;
+    flex-shrink: 0;
+    max-width: 100%;
+    width: auto;
+  `}
 `
 
 const NoResults = styled.div<{ closeOnClick?: boolean }>`
@@ -67,7 +69,7 @@ export const TokenDropdown: React.FC<{ onChange?: (token: Token | null) => void 
         <TextfieldContainer closeOnClick={false} key="tokenSearchInput">
           <Textfield
             debounceTimeout={300}
-            onChange={(e: { target: { value: string } }) => setSearchString(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value)}
             placeholder="Search token..."
             type="search"
             value={searchString}
