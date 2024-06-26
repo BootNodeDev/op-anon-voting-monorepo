@@ -14,6 +14,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().startsWith('G-').optional(),
   NEXT_PUBLIC_COOKIES_WARNING_ENABLED: z.enum(['true', 'false']).default('true'),
   NEXT_PUBLIC_DEFAULT_CHAIN_ID: z.enum(chainIdsArray).default(chainIdsArray[0]),
+  NEXT_PUBLIC_SUBGRAPH_URI: z.string().url(),
 })
 
 export const env = envSchema.parse(process.env)

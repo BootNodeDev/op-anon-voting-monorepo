@@ -1,0 +1,6 @@
+schema: 'https://optimism.easscan.org/graphql'
+documents: ['src/queries/**/*.ts']
+generates:
+  'types/generated/':
+    preset: client
+    presetConfig: { gqlTagName: 'gql' }

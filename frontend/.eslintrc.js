@@ -13,17 +13,11 @@ module.exports = {
     },
   },
   settings: {
-    'react': {
-      'version': 'detect'
-    }
+    react: {
+      version: 'detect',
+    },
   },
-  plugins: [
-    'react-hooks',
-    '@typescript-eslint',
-    'sort-destructure-keys',
-    'jsx-a11y',
-    'prettier',
-  ],
+  plugins: ['react-hooks', '@typescript-eslint', 'sort-destructure-keys', 'jsx-a11y', 'prettier'],
   extends: [
     'next/core-web-vitals',
     'eslint:recommended',
@@ -36,11 +30,10 @@ module.exports = {
   ],
   rules: {
     'import/extensions': 'off',
-    'import/extensions': 0,
     'import/no-cycle': [0, { ignoreExternal: true }],
     'import/no-unresolved': 0,
     'import/order': [
-      'error',
+      'warn',
       {
         alphabetize: { order: 'asc' },
         groups: [
@@ -52,8 +45,7 @@ module.exports = {
           { group: 'builtin', pattern: 'react', position: 'before' },
           {
             group: 'external',
-            pattern:
-              '{styled-components,polished,next,next/*,react-dom,sanitize.css}',
+            pattern: '{styled-components,polished,next,next/*,react-dom,sanitize.css}',
             position: 'before',
           },
         ],
@@ -70,7 +62,7 @@ module.exports = {
     ],
     'react/jsx-label-has-associated-control': 0,
     'react/jsx-sort-props': 2,
-    "react/react-in-jsx-scope": "off",
+    'react/react-in-jsx-scope': 'off',
     'react/no-unescaped-entities': 'off',
     'react/prop-types': 'off',
     'react-hooks/rules-of-hooks': 'error',
@@ -87,9 +79,9 @@ module.exports = {
       { functions: false, classes: false, variables: true },
     ],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    "no-constant-binary-expression": "error"
+    'no-constant-binary-expression': 'error',
   },
   globals: {
-    "React": "writable"
-  }
+    React: 'writable',
+  },
 }
