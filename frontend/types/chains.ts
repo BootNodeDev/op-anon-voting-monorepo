@@ -5,4 +5,5 @@ export type ChainConfig = Chain & {
   rpcUrl: string
   token: string
   blockExplorerUrls: string[]
+  subgraphUri: string
 }
