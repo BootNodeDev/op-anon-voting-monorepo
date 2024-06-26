@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import { DevelopedBy } from '@/src/components/assets/DevelopedBy'
+import { Bn } from '@/src/components/assets/Bn'
 import { InnerContainer as BaseInnerContainer } from '@/src/components/helpers/InnerContainer'
 import { BaseParagraph } from '@/src/components/text/BaseParagraph'
 import { useCookiesWarningContext } from '@/src/providers/cookiesWarningProvider'
@@ -15,9 +15,10 @@ const Wrapper = styled.footer`
 `
 
 const InnerContainer = styled(BaseInnerContainer)`
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  display: grid;
-  grid-template-columns: 1fr;
+  flex-direction: row;
 `
 
 const Paragraph = styled(BaseParagraph)`
@@ -40,6 +41,19 @@ const Item = styled.span`
     text-decoration: underline;
   }
 `
+const BuiltByLink = styled.a`
+  display: flex;
+  align-items: flex-start;
+  font-size: 1.2rem;
+  column-gap: 8px;
+  color: ${({ theme }) => theme.colors.textColor};
+  text-decoration: none;
+  &:hover,
+  &:active,
+  &:focus-visible {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`
 
 export const Footer: React.FC = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -50,12 +64,20 @@ export const Footer: React.FC = (props) => {
     <Wrapper {...props}>
       <InnerContainer>
         <Paragraph>
-          <DevelopedBy />
+          © {year}{' '}
+          <a href="https://bootnode.dev" rel="noopener noreferrer" target="_blank">
+            bootnode.dev
+          </a>
           {cookiesWarningEnabled && (
             <>
               <span>-</span> <Item onClick={showCookiesWarning}>Cookies</Item>
             </>
           )}
+        </Paragraph>
+        <Paragraph>
+          <BuiltByLink href="https://www.bootnode.dev/" rel="noopener noreferrer" target="_blank">
+            Built by <Bn />
+          </BuiltByLink>
         </Paragraph>
       </InnerContainer>
     </Wrapper>

@@ -10,7 +10,7 @@ const darkPrimary = darken(0.2, primary)
 const secondary = '#E56399'
 const tertiary = '#A6CFD5'
 const textColor = '#152445'
-const borderColor =  rgba(textColor, 0.1)
+const borderColor = rgba(textColor, 0.1)
 const gray = '#909AB2'
 const lighterGray = '#F3F3F3'
 const lightestGray = '#F7F8FC'
@@ -55,7 +55,8 @@ export const light = {
   card: {
     backgroundColor: white,
     borderColor: white,
-    boxShadow: '0px 41px 80px 0px rgba(0, 0, 0, 4%), 0px 20.756250381469727px 34.875px 0px rgba(0, 0, 0, 3%), 0px 8.199999809265137px 13px 0px rgba(0, 0, 0, 2%), 0px 1.7937500476837158px 4.625px 0px rgba(0, 0, 0, 1%)',
+    boxShadow:
+      '0px 41px 80px 0px rgba(0, 0, 0, 4%), 0px 20.756250381469727px 34.875px 0px rgba(0, 0, 0, 3%), 0px 8.199999809265137px 13px 0px rgba(0, 0, 0, 2%), 0px 1.7937500476837158px 4.625px 0px rgba(0, 0, 0, 1%)',
   },
   checkBox: {
     backgroundColorActive: secondary,

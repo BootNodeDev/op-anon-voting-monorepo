@@ -3,9 +3,9 @@ import styled from 'styled-components'
 
 import { Button } from '@/src/components/buttons/Button'
 import { UserDropdown } from '@/src/components/header/UserDropdown'
+import { InnerContainer } from '@/src/components/helpers/InnerContainer'
 import WrongNetwork from '@/src/components/utils/WrongNetwork'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
-import { InnerContainer } from '@/src/components/helpers/InnerContainer'
 
 const Wrapper = styled.header`
   align-items: center;
@@ -23,7 +23,6 @@ const Container = styled(InnerContainer)`
   flex-shrink: 0;
   height: 100%;
   justify-content: space-between;
-
 `
 
 const Start = styled.div`
@@ -70,7 +69,11 @@ export const Header: React.FC = (props) => {
                 <UserDropdown />
               </UserControls>
             )}
-            {!isWalletConnected && <Button variant='primary' onClick={connectWallet}>Connect wallet</Button>}
+            {!isWalletConnected && (
+              <Button onClick={connectWallet} variant="primary">
+                Connect wallet
+              </Button>
+            )}
           </End>
         </Container>
       </Wrapper>

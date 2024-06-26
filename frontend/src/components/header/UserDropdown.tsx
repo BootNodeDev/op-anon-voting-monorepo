@@ -1,20 +1,20 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
-import { Link as BaseLink } from '@/src/components/assets/Link'
+import Blockies from 'react-blockies'
+import toast, { Toast } from 'react-hot-toast'
+
+import { ArrowRight } from '@/src/components/assets/ArrowRight'
+import { Copy } from '@/src/components/assets/Copy'
 import { Logout } from '@/src/components/assets/Logout'
+import { MenuDots } from '@/src/components/assets/MenuDots'
 import { SwitchNetwork } from '@/src/components/assets/SwitchNetwork'
 import { DropdownPosition } from '@/src/components/common/Dropdown'
 import { Dropdown } from '@/src/components/header/Helpers'
 import { ModalSwitchNetwork } from '@/src/components/helpers/ModalSwitchNetwork'
+import { ToastComponent } from '@/src/components/toast/ToastComponent'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { truncateStringInTheMiddle } from '@/src/utils/strings'
-import { MenuDots } from '@/src/components/assets/MenuDots'
-import Blockies from 'react-blockies'
-import { Copy } from '@/src/components/assets/Copy'
-import { ArrowRight } from '@/src/components/assets/ArrowRight'
-import { ToastComponent } from '@/src/components/toast/ToastComponent'
-import toast, { Toast } from 'react-hot-toast'
 
 const Wrapper = styled(Dropdown)`
   .dropdownButton {
@@ -77,12 +77,6 @@ const AddressRow = styled.div`
   padding: 24px;
 `
 
-const Link = styled(BaseLink)`
-  .fill {
-    fill: #fff;
-  }
-`
-
 const UserButton = styled.button`
   background-color: ${({ theme: { colors } }) => colors.white};
   cursor: pointer;
@@ -137,9 +131,9 @@ const Account = styled.div`
   gap: 16px;
   font-size: 1.8rem;
   font-weight: 600;
-  `
+`
 const AddressActions = styled.div`
-display: flex;
+  display: flex;
   width: 100%;
   gap: 8px;
 `
@@ -155,12 +149,11 @@ const ActionButton = styled.button`
   padding: 16px;
   border-radius: 4px;
   font-size: 1.4rem;
-  &:hover{
+  &:hover {
     background-color: ${({ theme: { colors } }) => colors.lightGrey};
     color: ${({ theme: { colors } }) => colors.primary};
   }
 `
-
 
 export const UserDropdown: React.FC = ({ ...restProps }) => {
   const { address, disconnectWallet, getExplorerUrl, isWalletNetworkSupported } =
@@ -211,10 +204,14 @@ export const UserDropdown: React.FC = ({ ...restProps }) => {
                       <Blockies scale={5.6} seed={address} size={10} />
                     </Avatar>
                     {truncateStringInTheMiddle(address, 6, 4)}
-                    </Account>
+                  </Account>
                   <AddressActions>
-                    <ActionButton onClick={() => copyAddress(address)}><Copy /> Copy</ActionButton>
-                    <ActionButton onClick={disconnectWallet}><Logout /> Disconnect</ActionButton>
+                    <ActionButton onClick={() => copyAddress(address)}>
+                      <Copy /> Copy
+                    </ActionButton>
+                    <ActionButton onClick={disconnectWallet}>
+                      <Logout /> Disconnect
+                    </ActionButton>
                   </AddressActions>
                 </AddressInformation>
               ) : (
