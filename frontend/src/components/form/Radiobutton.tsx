@@ -11,10 +11,13 @@ export interface Props {
 
 const Wrapper = styled.span<{ disabled?: boolean }>`
   align-items: center;
-  column-gap: 8px;
+  column-gap: 16px;
+  padding: 8px;
+  border-radius: 60px;
+  background-color: ${({ theme: { colors } }) => colors.lighterGray};
   display: flex;
-  max-width: fit-content;
-
+  flex: 1 1 0;
+  font-size: 1.6rem;
   ${({ disabled }) =>
     disabled
       ? css`
@@ -36,7 +39,7 @@ const Radio = styled.span<Props>`
   border-color: ${({ theme: { radioButton } }) => radioButton.borderColor};
   border-radius: 50%;
   border-style: solid;
-  border-width: 1px;
+  border-width: 12px;
   box-sizing: border-box;
   flex-grow: 0;
   flex-shrink: 0;

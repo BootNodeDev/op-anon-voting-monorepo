@@ -2,7 +2,7 @@
 /* Add dimensions, fonts, paddings, margins, etc. here */
 
 const borderRadius = '2px'
-const radioAndCheckDimensions = '14px'
+const radioAndCheckDimensions = '40px'
 const componentPaddingHorizontal = '24px'
 const componentPaddingVertical = '24px'
 

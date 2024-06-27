@@ -9,7 +9,7 @@ const Wrapper = styled.div<{ status?: TextfieldStatus | undefined }>`
   display: flex;
   flex-direction: column;
   min-width: 0;
-  row-gap: 6px;
+  row-gap: 8px;
   position: relative;
 
   ${({ status }) =>
@@ -24,6 +24,13 @@ const Wrapper = styled.div<{ status?: TextfieldStatus | undefined }>`
     `}
 `
 
+const Description = styled.p`
+  max-width: 500px;
+  margin: 0;
+  font-size: 1.4rem;
+  opacity: 0.8;
+`
+
 const FormStatus = styled(BaseFormStatus)`
   left: 3px;
   position: absolute;
@@ -31,12 +38,13 @@ const FormStatus = styled(BaseFormStatus)`
 `
 
 export const Formfield: React.FC<{
+  description?: string
   formControl: React.ReactElement
   label?: string
   labelFor?: string
   status?: TextfieldStatus | undefined
   statusText?: string | undefined
-}> = ({ formControl, label, labelFor, status, statusText, ...restProps }) => {
+}> = ({ description, formControl, label, labelFor, status, statusText, ...restProps }) => {
   const control = useMemo(
     () =>
       cloneElement(formControl, {
@@ -50,6 +58,7 @@ export const Formfield: React.FC<{
       {label && <Label htmlFor={labelFor}>{label}</Label>}
       {control}
       {statusText && <FormStatus status={status}>{statusText}</FormStatus>}
+      {description && <Description>{description}</Description>}
     </Wrapper>
   )
 }

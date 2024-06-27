@@ -6,16 +6,25 @@ import { Address as ViemAddress } from 'viem'
 
 import { Button } from '@/src/components/buttons/Button'
 import { BaseCard } from '@/src/components/common/BaseCard'
-import { BaseParagraph, BigParagraph } from '@/src/components/text/BaseParagraph'
+import { Identity } from '@/src/components/common/Identity'
+import { Formfield } from '@/src/components/form/Formfield'
+import { Radiobutton } from '@/src/components/form/Radiobutton'
+import { Textfield } from '@/src/components/form/Textfield'
+import { BigParagraph } from '@/src/components/text/BaseParagraph'
 import { BaseTitle } from '@/src/components/text/BaseTitle'
-import { Code } from '@/src/components/text/Code'
 import { useIdentity } from '@/src/hooks/useIdentity'
 import { useUidEAS } from '@/src/hooks/useUidEAS'
-import { useWeb3ConnectedApp, useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
+import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { Maybe } from '@/types/utils'
 
 const Card = styled(BaseCard)`
   //min-height: 300px;
+`
+const Wrapper = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 950px;
 `
 const Title = styled(BaseTitle)`
   margin: 24px 0;
@@ -32,33 +41,35 @@ const NotConnected = styled.div`
 const ConnectButton = styled(Button)`
   padding: 24px 36px;
 `
-
-const Address: React.FC = () => {
-  const { address } = useWeb3ConnectedApp()
-
-  return address ? <Code>{address}</Code> : null
-}
-
-type DataViewProps = { message: string; data: Maybe<string> }
-const DataView = ({ data, message }: DataViewProps) => {
-  return data ? (
-    <BaseParagraph>
-      {message}
-      <Code>{data}</Code>
-    </BaseParagraph>
-  ) : null
-}
-
-const Input = styled.input``
-const Label = styled.label``
+const ActionsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`
+const VoteWrapper = styled.div`
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+`
+const RadioButtonsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  width: 100%;
+`
 
 type DataInputProps = {
   onChange: Dispatch<SetStateAction<string>>
   value: string
   id: string
   label: string
+  description?: string
 }
-const DataInput = ({ id, label, onChange, value }: DataInputProps) => {
+const DataInput = ({ description, id, label, onChange, value }: DataInputProps) => {
   const handleChange = useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {
       const newValue = event && event.target ? event.currentTarget.value : ''
@@ -69,8 +80,12 @@ const DataInput = ({ id, label, onChange, value }: DataInputProps) => {
 
   return (
     <>
-      <Label htmlFor={id}>{label}</Label>
-      <Input id={id} name={id} onChange={handleChange} type="text" value={value} />
+      <Formfield
+        description={description}
+        formControl={<Textfield id={id} onChange={handleChange} placeholder="" value={value} />}
+        label={label}
+        labelFor={label}
+      />
     </>
   )
 }
@@ -107,33 +122,66 @@ const Home: NextPage = () => {
       </Title>
       <Card>
         {isAppConnected ? (
-          <BaseParagraph>
-            Your wallet address: <Address />
-            <DataView
-              data={identity && identity.getCommitment().toString()}
+          <Wrapper>
+            <Identity
+              identity={identity && identity.getCommitment().toString()}
               message="Your identity is:"
-            ></DataView>
-            <Button onClick={() => createIdentity()}>1. Generate identity</Button>
-            <DataView data={uid} message="Your attestation id is:"></DataView>
+              onGenerate={() => createIdentity()}
+            />
+            {uid && (
+              <Identity
+                identity={uid}
+                message="Your attestation id is:"
+                onGenerate={() => createIdentity()}
+              />
+            )}
+
             <DataInput
+              description="Fill in the coordinator field with an address to create a poll, initiate the voting process, or conclude it."
               id="coordinator"
               label="Coordinator"
               onChange={setCoordinator as Dispatch<SetStateAction<string>>}
               value={coordinator}
             />
-            <DataInput id="poll-id" label="Poll ID" onChange={setPollId} value={pollId} />
-            <Button onClick={() => createPoll(coordinator)}>Create Poll</Button>
-            <Button
-              disabled={identity === null || uid === null}
-              onClick={() => identity && uid && addVoter(identity.getCommitment().toString(), uid)}
-            >
-              Enroll to vote
-            </Button>
-            <Button onClick={() => startPoll()}>Start Poll</Button>
-            <DataInput id="vote" label="Vote" onChange={setVote} value={vote} />
-            <Button onClick={() => castVote(+vote)}>Cast Vote</Button>
-            <Button onClick={() => endPoll()}>End Poll</Button>
-          </BaseParagraph>
+            <DataInput
+              description="Enter the ID of the poll you want to vote for or provide a unique ID to create a new one."
+              id="poll-id"
+              label="Poll ID"
+              onChange={setPollId}
+              value={pollId}
+            />
+            <ActionsWrapper>
+              {/* TODO: This button should be disabled if the ID is not available  */}
+              <Button onClick={() => createPoll(coordinator)}>Create Poll</Button>
+              {/* TODO: This button should be disabled if the poll wasn't created  */}
+              <Button onClick={() => startPoll()}>Start Poll</Button>
+              {/* TODO: This button should be disabled if the poll wasn't created and wasn't initiated */}
+              <Button onClick={() => endPoll()}>End Poll</Button>
+
+              <Button
+                disabled={identity === null || uid === null}
+                onClick={() =>
+                  identity && uid && addVoter(identity.getCommitment().toString(), uid)
+                }
+                variant="primaryInverted"
+              >
+                Enroll to vote
+              </Button>
+            </ActionsWrapper>
+
+            <VoteWrapper>
+              <RadioButtonsWrapper>
+                <Radiobutton checked={vote === '1'} onClick={() => setVote('1')}>
+                  Yes
+                </Radiobutton>
+                <Radiobutton checked={vote === '0'} onClick={() => setVote('0')}>
+                  No
+                </Radiobutton>
+              </RadioButtonsWrapper>
+              {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
+              <Button onClick={() => castVote(+vote)}>Cast Vote</Button>
+            </VoteWrapper>
+          </Wrapper>
         ) : (
           <NotConnected>
             <BigParagraph>
