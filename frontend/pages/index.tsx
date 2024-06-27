@@ -17,6 +17,12 @@ import { Maybe } from '@/types/utils'
 const Card = styled(BaseCard)`
   min-height: 300px;
 `
+const Title = styled(BaseTitle)`
+  margin: 24px 0;
+  @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
+    margin: 80px 0;
+  }
+`
 
 const Address: React.FC = () => {
   const { address } = useWeb3ConnectedApp()
@@ -86,7 +92,10 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <BaseTitle>Welcome to Anon Voting!</BaseTitle>
+      <Title>
+        Revolutionary anonymous voting system. <br />
+        Preserves users’ identity privacy.
+      </Title>
       <Card>
         {isAppConnected && (
           <BaseParagraph>
@@ -109,7 +118,7 @@ const Home: NextPage = () => {
               disabled={identity === null || uid === null}
               onClick={() => identity && uid && addVoter(identity.getCommitment().toString(), uid)}
             >
-              Add Voter
+              Enroll to vote
             </Button>
             <Button onClick={() => startPoll()}>Start Poll</Button>
             <DataInput id="vote" label="Vote" onChange={setVote} value={vote} />

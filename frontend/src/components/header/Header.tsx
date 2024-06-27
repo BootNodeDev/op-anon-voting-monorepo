@@ -1,42 +1,28 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { Button } from '@/src/components/buttons/Button'
-import { MobileMenuButton } from '@/src/components/buttons/MobileMenuButton'
-import { Logo as BaseLogo } from '@/src/components/common/Logo'
-import { NotificationsDropdown } from '@/src/components/header/NotificationsDropdown'
-import { SwitchThemeButton } from '@/src/components/header/SwitchThemeButton'
 import { UserDropdown } from '@/src/components/header/UserDropdown'
-import { ContainerPadding } from '@/src/components/helpers/ContainerPadding'
-import { MainMenu } from '@/src/components/navigation/MainMenu'
-import { MobileMenu } from '@/src/components/navigation/MobileMenu'
+import { InnerContainer } from '@/src/components/helpers/InnerContainer'
 import WrongNetwork from '@/src/components/utils/WrongNetwork'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 
 const Wrapper = styled.header`
   align-items: center;
-  background-color: ${({ theme }) => theme.header.backgroundColor};
   color: ${({ theme }) => theme.header.color};
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  height: ${({ theme }) => theme.header.height};
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  padding: 48px 0;
 `
 
-const InnerContainer = styled.div`
+const Container = styled(InnerContainer)`
   align-items: center;
   display: flex;
   flex-direction: row;
   flex-shrink: 0;
   height: 100%;
   justify-content: space-between;
-  margin: 0 auto;
-  width: 100%;
-
-  ${ContainerPadding}
 `
 
 const Start = styled.div`
@@ -46,12 +32,9 @@ const Start = styled.div`
   justify-content: flex-start;
 `
 
-const Logo = styled(BaseLogo)`
-  display: none;
-
-  @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
-    display: flex;
-  }
+const Logo = styled.strong`
+  font-size: 1.8rem;
+  font-weight: 400;
 `
 
 const End = styled.div`
@@ -70,36 +53,30 @@ const UserControls = styled.div`
 `
 
 export const Header: React.FC = (props) => {
-  const { connectWallet, isWalletConnected, isWalletNetworkSupported } = useWeb3Connection()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  const { connectWallet, isWalletConnected } = useWeb3Connection()
 
   return (
     <>
       <Wrapper {...props}>
-        <InnerContainer>
-          <MobileMenuButton onClick={toggleMenu} />
+        <Container>
           <Start>
-            <Logo />
+            <Logo>Anon Voting</Logo>
           </Start>
           <End>
             <WrongNetwork />
-            {isWalletConnected && isWalletNetworkSupported && <MainMenu />}
             {isWalletConnected && (
               <UserControls>
-                <NotificationsDropdown />
-                <SwitchThemeButton />
                 <UserDropdown />
               </UserControls>
             )}
-            {!isWalletConnected && <Button onClick={connectWallet}>Connect</Button>}
+            {!isWalletConnected && (
+              <Button onClick={connectWallet} variant="primary">
+                Connect wallet
+              </Button>
+            )}
           </End>
-        </InnerContainer>
+        </Container>
       </Wrapper>
-      {isMenuOpen && <MobileMenu onClick={toggleMenu} />}
     </>
   )
 }

@@ -34,10 +34,10 @@ const Card = styled(BaseCard)<{ size?: modalSize }>`
     size === 'sm' ? '325px' : size === 'md' ? '500px' : size === 'lg' ? '720px' : `${size}`};
 `
 
-const Title = styled.h1`
+const Title = styled.h2`
   color: ${({ theme }) => theme.colors.textColor};
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 600;
   line-height: 1.2;
   margin: 0 0 15px;
   text-align: left;

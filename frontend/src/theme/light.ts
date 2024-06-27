@@ -1,29 +1,34 @@
 /* Light Theme           */
 /* Add only colors here. */
 
-import { darken } from 'polished'
+import { darken, rgba } from 'polished'
 
-const error = '#db3333'
-const success = '#33dd33'
-const primary = '#320E3B'
+const error = '#FF9DBA'
+const success = '#25DFD4'
+const primary = '#5C5EED'
+const darkPrimary = darken(0.2, primary)
 const secondary = '#E56399'
 const tertiary = '#A6CFD5'
-const textColor = '#333'
-const borderColor = '#ccc'
-const darkGray = 'rgb(10, 25, 50)'
+const textColor = '#152445'
+const borderColor = rgba(textColor, 0.1)
+const gray = '#909AB2'
+const lighterGray = '#F3F3F3'
+const lightestGray = '#F7F8FC'
+const darkGray = '#7E8AA5'
 const darkGrayDarkened = darken(0.1, '#fff')
 const darkBlue = 'rgb(6, 75, 141)'
 const componentBackgroundColor = 'rgba(255, 255, 255, 0.95)'
+const white = '#fff'
 
 export const light = {
   body: {
-    backgroundColor: 'rgba(229, 243, 255, 0.5)',
+    backgroundColor: white,
     backgroundImage:
       'linear-gradient(80deg,rgba(17,10,10,0.2) 15%,rgba(92,33,52,0.2) 33%,rgba(6,75,141,0.2) 65%,rgba(13,2,2,0.1) 98%)',
   },
   button: {
     dropdown: {
-      backgroundColor: '#fff',
+      backgroundColor: white,
       backgroundColorHover: darkGrayDarkened,
       borderColor: borderColor,
       borderColorHover: borderColor,
@@ -31,12 +36,12 @@ export const light = {
       colorHover: textColor,
     },
     primary: {
-      backgroundColor: '#fff',
-      backgroundColorHover: darkGrayDarkened,
-      borderColor: borderColor,
-      borderColorHover: borderColor,
-      color: textColor,
-      colorHover: textColor,
+      backgroundColor: primary,
+      backgroundColorHover: darkPrimary,
+      borderColor: primary,
+      borderColorHover: darkPrimary,
+      color: white,
+      colorHover: white,
     },
     primaryInverted: {
       backgroundColor: textColor,
@@ -48,8 +53,10 @@ export const light = {
     },
   },
   card: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderColor: borderColor,
+    backgroundColor: white,
+    borderColor: white,
+    boxShadow:
+      '0px 41px 80px 0px rgba(0, 0, 0, 4%), 0px 20.756250381469727px 34.875px 0px rgba(0, 0, 0, 3%), 0px 8.199999809265137px 13px 0px rgba(0, 0, 0, 2%), 0px 1.7937500476837158px 4.625px 0px rgba(0, 0, 0, 1%)',
   },
   checkBox: {
     backgroundColorActive: secondary,
@@ -60,14 +67,19 @@ export const light = {
     borderColor: borderColor,
     componentBackgroundColor: componentBackgroundColor,
     darkBlue: darkBlue,
+    lighterGray: lighterGray,
+    lightestGray: lightestGray,
+    gray: gray,
     darkGray: darkGray,
     darkGrayDarkened: darkGrayDarkened,
     error: error,
     primary: primary,
+    darkPrimary: darkPrimary,
     secondary: secondary,
     success: success,
     tertiary: tertiary,
     textColor: textColor,
+    white: white,
   },
   dropdown: {
     background: '#fff',
@@ -75,11 +87,11 @@ export const light = {
     boxShadow: 'none',
     item: {
       backgroundColor: 'transparent',
-      backgroundColorHover: darkGrayDarkened,
+      backgroundColorHover: lightestGray,
       borderColor: borderColor,
       color: textColor,
       colorDanger: error,
-      colorHover: textColor,
+      colorHover: primary,
       colorOK: success,
     },
   },

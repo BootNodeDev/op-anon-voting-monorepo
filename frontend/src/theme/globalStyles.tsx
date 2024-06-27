@@ -13,15 +13,31 @@ export const GlobalStyles = createGlobalStyle<{ theme?: any }>`
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     background-color: ${({ theme: { body } }) => body.backgroundColor};
-    background-image: ${({ theme: { body } }) => body.backgroundImage};
     background-size: cover;
     color: ${({ theme: { colors } }) => colors.textColor};
     font-family: ${({ theme: { fonts } }) => fonts.family};
     font-size: ${({ theme: { fonts } }) => fonts.defaultSize};
     min-height: 100vh;
     outline-color: ${({ theme: { colors } }) => colors.secondary};
+    position: relative;
+    &::before{
+      content: '';
+      position: absolute;
+      display: block;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 500px;
+      background-color: ${({ theme: { colors } }) => colors.lightestGray};
+      z-index: -1;
+      @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
+        height: 600px;
   }
-
+    }
+  }
+  button{
+    font-family: ${({ theme: { fonts } }) => fonts.family} !important;
+  }
   code {
     font-family: ${({ theme: { fonts } }) => fonts.familyCode};
   }
