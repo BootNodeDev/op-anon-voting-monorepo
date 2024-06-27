@@ -21,6 +21,7 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => uint256) public decryptionKey;
 
     mapping(uint256 => uint256[]) internal _votes;
+    mapping(uint256 => uint256[]) internal _voters;
 
     constructor(ISemaphoreVerifier _verifier) SemaphoreVoting(_verifier) { }
 
@@ -36,6 +37,7 @@ contract AnonVoting is SemaphoreVoting {
         }
 
         enrolled[pollId][msg.sender] = true;
+        _voters[pollId].push(identityCommitment);
 
         _addMember(pollId, identityCommitment);
     }
@@ -66,5 +68,9 @@ contract AnonVoting is SemaphoreVoting {
 
     function votes(uint256 pollId) public view returns (uint256[] memory) {
         return _votes[pollId];
+    }
+
+    function voters(uint256 pollId) public view returns (uint256[] memory) {
+        return _voters[pollId];
     }
 }
