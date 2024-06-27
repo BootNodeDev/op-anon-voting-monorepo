@@ -245,6 +245,16 @@ export const ModalCSS = `
   justify-content: center !important;
   width: 58px !important;
 }
+.fixed .modal .content .wallet-button-container-inner .icon{
+  height: 100%;
+  width: 100%;
+  font-size: 0;
+  line-height: 0;
+}
+.fixed .modal .content .wallet-button-container-inner .icon svg{
+    width: 58px;
+    height: 58px;
+}
 
 .fixed .modal .onboard-button-primary{
   align-items: center;
