@@ -1,8 +1,8 @@
 import React, { ReactElement } from 'react'
 import styled from 'styled-components'
 
-import { ChainNames, mapId2Name } from '../config/wagmi'
 import { Button } from '@/src/components/buttons/Button'
+import { ChainNames, mapId2Name } from '@/src/config/wagmi'
 import { chainsConfig } from '@/src/config/web3'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 

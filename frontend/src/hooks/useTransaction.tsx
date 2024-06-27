@@ -4,7 +4,7 @@ import { Client } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import { usePublicClient } from 'wagmi'
 
-import { ContractTransaction } from '../components/buttons/ContractTransaction'
+import { ContractTransaction } from '@/src/components/buttons/ContractTransaction'
 import { useTransactionNotification } from '@/src/providers/TransactionNotificationProvider'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { TransactionError } from '@/src/utils/TransactionError'
