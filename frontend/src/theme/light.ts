@@ -74,6 +74,7 @@ export const light = {
     darkGrayDarkened: darkGrayDarkened,
     error: error,
     primary: primary,
+    darkPrimary: darkPrimary,
     secondary: secondary,
     success: success,
     tertiary: tertiary,

@@ -7,7 +7,6 @@ import { useReadContract, useSignMessage, useWriteContract } from 'wagmi'
 
 import { contracts } from '../contracts/contracts'
 import { useWeb3Connection } from '../providers/web3ConnectionProvider'
-
 import { Maybe } from '@/types/utils'
 
 // TODO Use current chain
