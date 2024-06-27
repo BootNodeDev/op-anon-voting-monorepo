@@ -6,7 +6,7 @@ import { Address as ViemAddress } from 'viem'
 
 import { Button } from '@/src/components/buttons/Button'
 import { BaseCard } from '@/src/components/common/BaseCard'
-import { BaseParagraph } from '@/src/components/text/BaseParagraph'
+import { BaseParagraph, BigParagraph } from '@/src/components/text/BaseParagraph'
 import { BaseTitle } from '@/src/components/text/BaseTitle'
 import { Code } from '@/src/components/text/Code'
 import { useIdentity } from '@/src/hooks/useIdentity'
@@ -15,13 +15,22 @@ import { useWeb3ConnectedApp, useWeb3Connection } from '@/src/providers/web3Conn
 import { Maybe } from '@/types/utils'
 
 const Card = styled(BaseCard)`
-  min-height: 300px;
+  //min-height: 300px;
 `
 const Title = styled(BaseTitle)`
   margin: 24px 0;
   @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
     margin: 80px 0;
   }
+`
+const NotConnected = styled.div`
+  padding: 32px 0px;
+  @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
+    padding: 48px 24px;
+  }
+`
+const ConnectButton = styled(Button)`
+  padding: 24px 36px;
 `
 
 const Address: React.FC = () => {
@@ -67,7 +76,7 @@ const DataInput = ({ id, label, onChange, value }: DataInputProps) => {
 }
 
 const Home: NextPage = () => {
-  const { address = '0x', isAppConnected } = useWeb3Connection()
+  const { address = '0x', connectWallet, isAppConnected } = useWeb3Connection()
   const [pollId, setPollId] = useState('1')
   const { addVoter, castVote, createIdentity, createPoll, endPoll, identity, startPoll } =
     useIdentity(BigInt(pollId))
@@ -97,7 +106,7 @@ const Home: NextPage = () => {
         Preserves users’ identity privacy.
       </Title>
       <Card>
-        {isAppConnected && (
+        {isAppConnected ? (
           <BaseParagraph>
             Your wallet address: <Address />
             <DataView
@@ -125,6 +134,17 @@ const Home: NextPage = () => {
             <Button onClick={() => castVote(+vote)}>Cast Vote</Button>
             <Button onClick={() => endPoll()}>End Poll</Button>
           </BaseParagraph>
+        ) : (
+          <NotConnected>
+            <BigParagraph>
+              Effortlessly connect your wallet, generate a secure anonymous identity, and dive into
+              the power of decentralized decision-making by <strong>creating polls</strong> or{' '}
+              <strong>casting your vote</strong>.
+            </BigParagraph>
+            <ConnectButton onClick={connectWallet} variant="primary">
+              Connect wallet
+            </ConnectButton>
+          </NotConnected>
         )}
       </Card>
     </>

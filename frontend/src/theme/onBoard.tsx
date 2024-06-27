@@ -67,13 +67,13 @@ export const onBoardCSS = css`
   }
 `
 export const ModalCSS = `
-.fixed .modal-overflow {
+.flex .modal-overflow {
   overflow: visible;
 }
 
 .fixed .modal {
   background-color: transparent;
-  box-shadow: 0px 100px 80px rgba(67, 21, 86, 0.07), 0px 50.625px 34.875px rgba(67, 21, 86, 0.04725), 0px 20px 13px rgba(67, 21, 86, 0.035), 0px 4.375px 4.625px rgba(67, 21, 86, 0.02275);
+  box-shadow: 0px 100px 80px rgba(68, 68, 68, 0.07), 0px 50.625px 34.875px rgba(43, 43, 43, 0.047), 0px 20px 13px rgba(45, 45, 45, 0.035), 0px 4.375px 4.625px rgba(71, 71, 71, 0.023);
   overflow: visible;
 }
 

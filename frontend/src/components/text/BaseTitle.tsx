@@ -6,7 +6,11 @@ export const BaseTitle = styled.h1`
   font-weight: 400;
   line-height: 1.5;
   margin: 0 0 24px;
+
+  @media (min-width: ${({ theme }) => theme.breakPoints.tabletPortraitStart}) {
+    font-size: 2.8rem;
+  }
   @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
-    font-size: 3.2rem;
+    font-size: 3.6rem;
   }
 `
