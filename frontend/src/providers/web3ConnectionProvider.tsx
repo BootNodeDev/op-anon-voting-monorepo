@@ -17,7 +17,7 @@ import { createWalletClient, custom } from 'viem'
 import { useAccount } from 'wagmi'
 import { UseAccountReturnType } from 'wagmi'
 
-import { ChainIds, chainIds, config, mapId2Name } from '../config/wagmi'
+import { ChainIds, chainIds, config, mapId2Name } from '@/src/config/wagmi'
 import { chainsConfig, getNetworkConfig } from '@/src/config/web3'
 import { appName } from '@/src/constants/common'
 import {
