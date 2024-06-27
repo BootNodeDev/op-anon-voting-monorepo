@@ -118,7 +118,7 @@ const Home: NextPage = () => {
               disabled={identity === null || uid === null}
               onClick={() => identity && uid && addVoter(identity.getCommitment().toString(), uid)}
             >
-              Add Voter
+              Enroll to vote
             </Button>
             <Button onClick={() => startPoll()}>Start Poll</Button>
             <DataInput id="vote" label="Vote" onChange={setVote} value={vote} />
