@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import { Group } from '@semaphore-protocol/group'
 import { Identity } from '@semaphore-protocol/identity'
 import { generateProof } from '@semaphore-protocol/proof'
 import { Address } from 'viem'
-import { useReadContract, useSignMessage, useWriteContract } from 'wagmi'
+import { useSignMessage, useWriteContract } from 'wagmi'
 
-import { contracts } from '../contracts/contracts'
-import { useWeb3Connection } from '../providers/web3ConnectionProvider'
+import { contracts } from '@/src/contracts/contracts'
+import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { Maybe } from '@/types/utils'
 
 // TODO Use current chain
@@ -16,7 +17,7 @@ const anonVoting = {
 } as const
 
 const MESSAGE = 'BOOT_NODE_ANON_VOTING'
-const MT_DEPTH = 16
+const MT_DEPTH = 32
 const PASSWORD = ''
 
 export const useIdentity = (pollIdProp: bigint) => {
@@ -24,13 +25,6 @@ export const useIdentity = (pollIdProp: bigint) => {
   const [pollId, setPollId] = useState(pollIdProp)
 
   const { signMessage } = useSignMessage()
-  const { data: mkTreeRoot } = useReadContract({
-    abi: anonVoting.abi,
-    address: anonVoting.address as Address,
-    functionName: 'getMerkleTreeRoot',
-    args: [pollId],
-  })
-  console.log({ mkTreeRoot })
   const { writeContractAsync } = useWriteContract() // TODO Replace with hooks after etherscan verification
   const [identity, setIdentity] = useState<Maybe<Identity>>(null)
 
@@ -38,18 +32,19 @@ export const useIdentity = (pollIdProp: bigint) => {
     setPollId(pollIdProp)
   }, [pollIdProp])
 
-  // TODO Receive some state values of the poll
-
   const makeProof = useCallback(
     async (vote: bigint) => {
       if (!identity) throw Error('no identity')
-      // group, externalNullifier
       const externalNullifier = pollId
-      const proof = await generateProof(identity, mkTreeRoot, externalNullifier, vote)
+
+      const group = new Group(pollId, MT_DEPTH, [])
+      group.addMember(identity.getCommitment().toString())
+
+      const proof = await generateProof(identity, group, externalNullifier, vote)
 
       return proof
     },
-    [identity, mkTreeRoot, pollId],
+    [identity, pollId],
   )
 
   const createPoll = useCallback(
@@ -79,10 +74,8 @@ export const useIdentity = (pollIdProp: bigint) => {
         { account: address, message },
         {
           onSuccess: (data) => {
-            console.log(data)
             const id = new Identity(data.toString())
             setIdentity(id)
-            console.log(id)
           },
         },
       ),
@@ -91,18 +84,13 @@ export const useIdentity = (pollIdProp: bigint) => {
 
   const addVoter = useCallback(
     async (commitment: string, uid: Address) => {
-      console.log({ commitment, uid })
       await writeContractAsync({
         ...anonVoting,
         functionName: 'addVoter',
         args: [BigInt(pollId), BigInt(commitment), uid],
+      }).catch((e) => {
+        console.error(e)
       })
-        .then((hash) => {
-          console.log({ voterAddedHash: hash })
-        })
-        .catch((e) => {
-          console.error(e)
-        })
     },
     [pollId, writeContractAsync],
   )
@@ -123,18 +111,18 @@ export const useIdentity = (pollIdProp: bigint) => {
 
   const castVote = useCallback(
     async (vote: number) => {
-      const proof = await makeProof(BigInt(vote))
+      const proofObject = await makeProof(BigInt(vote))
+      const { externalNullifier, nullifierHash, proof } = proofObject
+
+      const signal = BigInt(vote)
+
       await writeContractAsync({
         ...anonVoting,
         functionName: 'castVote',
-        args: [proof.signal, proof.nullifierHash, proof.externalNullifier, proof.proof],
+        args: [signal, nullifierHash, externalNullifier, proof],
+      }).catch((e) => {
+        console.error(e)
       })
-        .then((hash) => {
-          console.log({ voterAddedHash: hash })
-        })
-        .catch((e) => {
-          console.error(e)
-        })
     },
     [makeProof, writeContractAsync],
   )
