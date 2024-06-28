@@ -111,20 +111,19 @@ export const useIdentity = (pollIdProp: bigint) => {
 
   const castVote = useCallback(
     async (vote: number) => {
-      const proofObject = await makeProof(BigInt(vote))
-      const { externalNullifier, nullifierHash, proof } = proofObject
+      const semaphoreProof = await makeProof(BigInt(vote))
 
-      const signal = BigInt(vote)
-
-      await writeContractAsync({
-        ...anonVoting,
-        functionName: 'castVote',
-        args: [signal, nullifierHash, externalNullifier, proof],
+      fetch('/api/castVote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ vote, semaphoreProof }),
       }).catch((e) => {
         console.error(e)
       })
     },
-    [makeProof, writeContractAsync],
+    [makeProof],
   )
 
   return { identity, createIdentity, createPoll, addVoter, startPoll, endPoll, castVote }
