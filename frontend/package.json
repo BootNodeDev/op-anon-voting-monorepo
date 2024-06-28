@@ -17,6 +17,7 @@
   "dependencies": {
     "@apollo/client": "^3.10.5",
     "@semaphore-protocol/identity": "^3",
+    "@semaphore-protocol/group": "^3",
     "@semaphore-protocol/proof": "^3",
     "@tanstack/react-query": "^5.40.1",
     "@types/react-blockies": "^1.4.4",

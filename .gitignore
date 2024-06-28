@@ -19,3 +19,4 @@ yarn.lock
 broadcast/*
 broadcast/*/31337/
 contracts/broadcast
+contracts/test/snark-artifacts/**/*

@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 
-import { EasAttesterQuery } from '../queries/eas'
+import { EasAttesterQuery } from '@/src/queries/eas'
 
 type Props = {
   schemaId: string

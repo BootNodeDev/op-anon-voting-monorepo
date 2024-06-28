@@ -1,5 +1,5 @@
-import AnonVotingAbi from './abis/AnonVoting.abi'
-import { ZERO_ADDRESS } from '../constants/bigNumber'
+import { ZERO_ADDRESS } from '@/src/constants/bigNumber'
+import AnonVotingAbi from '@/src/contracts/abis/AnonVoting.abi'
 
 export type ContractsKeys = 'AnonVoting'
 

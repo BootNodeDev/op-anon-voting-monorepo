@@ -2,8 +2,8 @@ import { FC, PropsWithChildren, createContext, useContext } from 'react'
 
 import useSWR from 'swr'
 
-import { TokensLists } from '../config/tokenLists'
 import { withGenericSuspense } from '@/src/components/helpers/SafeSuspense'
+import { TokensLists } from '@/src/config/tokenLists'
 import {
   Token,
   TokenListResponse,
