@@ -26,6 +26,11 @@ const Wrapper = styled.section`
   gap: 32px;
   max-width: 950px;
 `
+const IdentityWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`
 const Title = styled(BaseTitle)`
   margin: 24px 0;
   @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
@@ -38,7 +43,7 @@ const NotConnected = styled.div`
     padding: 48px 24px;
   }
 `
-const ConnectButton = styled(Button)`
+const BigButton = styled(Button)`
   padding: 24px 36px;
 `
 const ActionsWrapper = styled.div`
@@ -123,19 +128,20 @@ const Home: NextPage = () => {
       <Card>
         {isAppConnected ? (
           <Wrapper>
-            <Identity
-              identity={identity && identity.getCommitment().toString()}
-              message="Your identity is:"
-              onGenerate={() => createIdentity()}
-            />
-            {uid && (
+            <IdentityWrapper>
               <Identity
-                identity={uid}
-                message="Your attestation id is:"
+                identity={identity && identity.getCommitment().toString()}
+                message="Your identity is:"
                 onGenerate={() => createIdentity()}
               />
-            )}
-
+              {uid && (
+                <Identity
+                  identity={uid}
+                  message="Your attestation id is:"
+                  onGenerate={() => createIdentity()}
+                />
+              )}
+            </IdentityWrapper>
             <DataInput
               description="Fill in the coordinator field with an address to create a poll, initiate the voting process, or conclude it."
               id="coordinator"
@@ -153,9 +159,9 @@ const Home: NextPage = () => {
             <ActionsWrapper>
               {/* TODO: This button should be disabled if the ID is not available  */}
               <Button onClick={() => createPoll(coordinator)}>Create Poll</Button>
-              {/* TODO: This button should be disabled if the poll wasn't created  */}
+              {/* TODO: This button should be disabled if the poll wasn't created and you are not the creator  */}
               <Button onClick={() => startPoll()}>Start Poll</Button>
-              {/* TODO: This button should be disabled if the poll wasn't created and wasn't initiated */}
+              {/* TODO: This button should be disabled if the poll wasn't created and wasn't initiated and you are not the creator */}
               <Button onClick={() => endPoll()}>End Poll</Button>
 
               <Button
@@ -179,7 +185,7 @@ const Home: NextPage = () => {
                 </Radiobutton>
               </RadioButtonsWrapper>
               {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
-              <Button onClick={() => castVote(+vote)}>Cast Vote</Button>
+              <BigButton onClick={() => castVote(+vote)}>Cast Vote</BigButton>
             </VoteWrapper>
           </Wrapper>
         ) : (
@@ -189,9 +195,9 @@ const Home: NextPage = () => {
               the power of decentralized decision-making by <strong>creating polls</strong> or{' '}
               <strong>casting your vote</strong>.
             </BigParagraph>
-            <ConnectButton onClick={connectWallet} variant="primary">
+            <BigButton onClick={connectWallet} variant="primary">
               Connect wallet
-            </ConnectButton>
+            </BigButton>
           </NotConnected>
         )}
       </Card>
