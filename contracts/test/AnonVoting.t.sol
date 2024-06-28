@@ -93,6 +93,14 @@ contract AddVoter is AnonVotingTest {
         anonVoting.addVoter(pollId, 69, REAL_UID);
     }
 
+    function test_StoresVotersIdentityCommitment() public {
+        Attestation memory att = eas.getAttestation(REAL_UID);
+        vm.prank(att.recipient);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+
+        assertEq(anonVoting.voters(pollId)[0], identityCommitment);
+    }
+
     event MemberAdded(uint256 indexed groupId, uint256 index, uint256 identityCommitment, uint256 merkleTreeRoot);
 }
 
