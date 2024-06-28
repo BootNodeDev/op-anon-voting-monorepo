@@ -169,7 +169,7 @@ contract CastVote is AnonVotingTest {
 }
 
 contract SetTrustedAttester is AnonVotingTest {
-    uint256 altPollId = 42;
+    uint256 internal altPollId = 42;
 
     function setUp() public override {
         super.setUp();
@@ -203,7 +203,7 @@ contract SetTrustedAttester is AnonVotingTest {
 }
 
 contract SetValidSchema is AnonVotingTest {
-    uint256 altPollId = 42;
+    uint256 internal altPollId = 42;
 
     function setUp() public override {
         super.setUp();
