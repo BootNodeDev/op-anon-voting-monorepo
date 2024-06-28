@@ -24,7 +24,7 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => mapping(bytes32 => bool)) public validSchemas;
     mapping(uint256 => uint256[]) internal _votes;
     mapping(uint256 => uint256[]) internal _voters;
-    uint256[] internal _polls;
+    uint256[] internal _pollIds;
 
     struct PollData {
         uint256 id;
@@ -38,7 +38,7 @@ contract AnonVoting is SemaphoreVoting {
 
     function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth) public override {
         super.createPoll(pollId, coordinator, merkleTreeDepth);
-        _polls.push(pollId);
+        _pollIds.push(pollId);
     }
 
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
@@ -104,10 +104,10 @@ contract AnonVoting is SemaphoreVoting {
     }
 
     function getPolls() public view returns (PollData[] memory) {
-        PollData[] memory allPolls = new PollData[](_polls.length);
+        PollData[] memory allPolls = new PollData[](_pollIds.length);
 
-        for (uint256 i; i < _polls.length; ++i) {
-            uint256 pollId = _polls[i];
+        for (uint256 i; i < _pollIds.length; ++i) {
+            uint256 pollId = _pollIds[i];
             allPolls[i] = getPoll(pollId);
         }
 
