@@ -37,7 +37,7 @@ contract SemaphoreVoting is ISemaphoreVoting, SemaphoreGroups {
     }
 
     /// @dev See {ISemaphoreVoting-createPoll}.
-    function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth) public override {
+    function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth) public virtual override {
         if (merkleTreeDepth < 16 || merkleTreeDepth > 32) {
             revert Semaphore__MerkleTreeDepthIsNotSupported();
         }
