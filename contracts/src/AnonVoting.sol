@@ -24,8 +24,22 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => mapping(bytes32 => bool)) public validSchemas;
     mapping(uint256 => uint256[]) internal _votes;
     mapping(uint256 => uint256[]) internal _voters;
+    uint256[] internal _pollIds;
+
+    struct PollData {
+        uint256 id;
+        address coordinator;
+        PollState state;
+        uint256[] votes;
+        uint256[] voters;
+    }
 
     constructor(ISemaphoreVerifier _verifier) SemaphoreVoting(_verifier) { }
+
+    function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth) public override {
+        super.createPoll(pollId, coordinator, merkleTreeDepth);
+        _pollIds.push(pollId);
+    }
 
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
         Attestation memory att = eas.getAttestation(uid);
@@ -77,11 +91,26 @@ contract AnonVoting is SemaphoreVoting {
         validSchemas[pollId][schema] = valid;
     }
 
-    function votes(uint256 pollId) public view returns (uint256[] memory) {
-        return _votes[pollId];
+    function getPoll(uint256 pollId) public view returns (PollData memory) {
+        PollData memory pollData;
+        Poll storage poll = polls[pollId];
+        pollData.id = pollId;
+        pollData.coordinator = poll.coordinator;
+        pollData.state = poll.state;
+        pollData.votes = _votes[pollId];
+        pollData.voters = _voters[pollId];
+
+        return pollData;
     }
 
-    function voters(uint256 pollId) public view returns (uint256[] memory) {
-        return _voters[pollId];
+    function getPolls() public view returns (PollData[] memory) {
+        PollData[] memory allPolls = new PollData[](_pollIds.length);
+
+        for (uint256 i; i < _pollIds.length; ++i) {
+            uint256 pollId = _pollIds[i];
+            allPolls[i] = getPoll(pollId);
+        }
+
+        return allPolls;
     }
 }
