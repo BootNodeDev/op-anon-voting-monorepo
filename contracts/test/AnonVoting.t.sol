@@ -42,45 +42,57 @@ contract AnonVotingTest is Test, Constants {
 
         vm.prank(COORDINATOR);
         anonVoting.setTrustedAttester(pollId, OPTIMISM_ATTESTER, true);
+
+        vm.prank(COORDINATOR);
+        anonVoting.setValidSchema(pollId, RETROPGF_SCHEMA_UID, true);
     }
 }
 
 contract AddVoter is AnonVotingTest {
     function test_CanAddSelfByAttestationUID() public {
-        Attestation memory att = eas.getAttestation(REAL_UID);
+        Attestation memory att = eas.getAttestation(REAL_ATT_UID);
 
         vm.expectEmit(true, true, true, false, address(anonVoting));
         emit MemberAdded(pollId, 0, identityCommitment, 0);
 
         vm.prank(att.recipient);
-        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_ATT_UID);
     }
 
     function test_CanEnrollForMultiplePolls() public {
-        Attestation memory att = eas.getAttestation(REAL_UID);
+        Attestation memory att = eas.getAttestation(REAL_ATT_UID);
         vm.prank(att.recipient);
-        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_ATT_UID);
 
-        anonVoting.createPoll(69, COORDINATOR, 32);
+        uint256 altPollId = 42;
+        anonVoting.createPoll(altPollId, COORDINATOR, 32);
 
         vm.prank(COORDINATOR);
-        anonVoting.setTrustedAttester(69, OPTIMISM_ATTESTER, true);
+        anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
+
+        vm.prank(COORDINATOR);
+        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
 
         vm.expectEmit(true, true, true, false, address(anonVoting));
-        emit MemberAdded(69, 0, identityCommitment, 0);
+        emit MemberAdded(altPollId, 0, identityCommitment, 0);
 
         vm.prank(att.recipient);
-        anonVoting.addVoter(69, identityCommitment, REAL_UID);
+        anonVoting.addVoter(altPollId, identityCommitment, REAL_ATT_UID);
     }
 
     function test_RevertIf_AttestationDoesNotBelongToVoter() public {
         vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Does not belong to voter"));
-        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_ATT_UID);
     }
 
     function test_RevertIf_AttestationIsNotFromTrustedAttester() public {
         vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Not from trusted attester"));
-        anonVoting.addVoter(pollId, identityCommitment, FAKE_UID);
+        anonVoting.addVoter(pollId, identityCommitment, FAKE_ATT_UID);
+    }
+
+    function test_RevertIf_AttestationIsNotForValidSchema() public {
+        vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Not a valid schema"));
+        anonVoting.addVoter(pollId, identityCommitment, INVALID_ATT_UID);
     }
 
     function test_RevertIf_CoordinatorAttemptsToAddVoter() public {
@@ -90,13 +102,13 @@ contract AddVoter is AnonVotingTest {
     }
 
     function test_RevertIf_VoterAttemptsDoubleEnrollment() public {
-        Attestation memory att = eas.getAttestation(REAL_UID);
+        Attestation memory att = eas.getAttestation(REAL_ATT_UID);
         vm.prank(att.recipient);
-        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_ATT_UID);
 
         vm.expectRevert(abi.encodeWithSelector(AnonVoting.AlreadyEnrolled.selector, att.recipient, pollId));
         vm.prank(att.recipient);
-        anonVoting.addVoter(pollId, 69, REAL_UID);
+        anonVoting.addVoter(pollId, 69, REAL_ATT_UID);
     }
 
     event MemberAdded(uint256 indexed groupId, uint256 index, uint256 identityCommitment, uint256 merkleTreeRoot);
@@ -141,9 +153,9 @@ contract CastVote is AnonVotingTest {
     function setUp() public override {
         super.setUp();
 
-        Attestation memory att = eas.getAttestation(REAL_UID);
+        Attestation memory att = eas.getAttestation(REAL_ATT_UID);
         vm.prank(att.recipient);
-        anonVoting.addVoter(pollId, identityCommitment, REAL_UID);
+        anonVoting.addVoter(pollId, identityCommitment, REAL_ATT_UID);
 
         vm.prank(COORDINATOR);
         anonVoting.startPoll(pollId, encryptionKey);
@@ -187,5 +199,39 @@ contract SetTrustedAttester is AnonVotingTest {
     function test_RevertWhen_NotCalledByCoordinator() public {
         vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
         anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
+    }
+}
+
+contract SetValidSchema is AnonVotingTest {
+    uint256 altPollId = 42;
+
+    function setUp() public override {
+        super.setUp();
+
+        anonVoting.createPoll(altPollId, COORDINATOR, 32);
+    }
+
+    function test_CanAddValidSchema() public {
+        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), false);
+
+        vm.prank(COORDINATOR);
+        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
+
+        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), true);
+    }
+
+    function test_CanRemoveValidSchema() public {
+        vm.prank(COORDINATOR);
+        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
+        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), true);
+
+        vm.prank(COORDINATOR);
+        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, false);
+        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), false);
+    }
+
+    function test_RevertWhen_NotCalledByCoordinator() public {
+        vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
+        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
     }
 }
