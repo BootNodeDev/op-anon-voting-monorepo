@@ -91,22 +91,14 @@ contract AnonVoting is SemaphoreVoting {
         validSchemas[pollId][schema] = valid;
     }
 
-    function votes(uint256 pollId) public view returns (uint256[] memory) {
-        return _votes[pollId];
-    }
-
-    function voters(uint256 pollId) public view returns (uint256[] memory) {
-        return _voters[pollId];
-    }
-
     function getPoll(uint256 pollId) public view returns (PollData memory) {
         PollData memory pollData;
         Poll storage poll = polls[pollId];
         pollData.id = pollId;
         pollData.coordinator = poll.coordinator;
         pollData.state = poll.state;
-        pollData.votes = votes(pollId);
-        pollData.voters = voters(pollId);
+        pollData.votes = _votes[pollId];
+        pollData.voters = _voters[pollId];
 
         return pollData;
     }

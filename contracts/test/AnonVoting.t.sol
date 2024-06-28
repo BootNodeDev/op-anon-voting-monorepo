@@ -129,7 +129,8 @@ contract AddVoter is AnonVotingTest {
         vm.prank(att.recipient);
         anonVoting.addVoter(pollId, identityCommitment, REAL_ATT_UID);
 
-        assertEq(anonVoting.voters(pollId)[0], identityCommitment);
+        AnonVoting.PollData memory pollData = anonVoting.getPoll(pollId);
+        assertEq(pollData.voters[0], identityCommitment);
     }
 
     event MemberAdded(uint256 indexed groupId, uint256 index, uint256 identityCommitment, uint256 merkleTreeRoot);
@@ -184,8 +185,10 @@ contract CastVote is AnonVotingTest {
 
     function test_StoresVote() public {
         anonVoting.castVote(vote, nullifierHash, pollId, proof);
-        assertEq(anonVoting.votes(pollId).length, 1);
-        assertEq(anonVoting.votes(pollId)[0], vote);
+
+        AnonVoting.PollData memory pollData = anonVoting.getPoll(pollId);
+        assertEq(pollData.votes.length, 1);
+        assertEq(pollData.votes[0], vote);
     }
 }
 
