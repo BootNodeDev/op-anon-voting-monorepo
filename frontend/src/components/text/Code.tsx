@@ -9,4 +9,6 @@ export const Code = styled.span`
   font-size: 1.3rem;
   line-height: 1.2;
   padding: 0 5px;
+  word-break: break-all;
+  max-width: 100%;
 `

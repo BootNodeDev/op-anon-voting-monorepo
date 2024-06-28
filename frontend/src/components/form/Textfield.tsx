@@ -82,7 +82,7 @@ export const TextfieldCSS = css<TexfieldCSSProps>`
   --textfield-border-radius: 8px;
   --texfield-font-size: 1.4rem;
   --textfield-padding: 0 12px;
-  --textfield-height: 36px;
+  --textfield-height: 52px;
   --textfield-font-weight: 400;
 
   background-color: ${({ theme: { textField } }) => textField.backgroundColor};
