@@ -42,7 +42,6 @@ contract AnonVotingTest is Test, Constants {
         18_617_199_750_602_324_979_667_465_078_511_901_015_698_716_429_734_487_391_056_688_979_349_462_682_641
     ];
 
-
     uint256 internal encryptionKey = 12_345;
     uint256 internal decryptionKey = 67_890;
 
