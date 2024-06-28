@@ -6,7 +6,7 @@ import { SemaphoreVoting } from "src/vendor/SemaphoreVoting.sol";
 
 import { IEAS, Attestation } from "@ethereum-attestation-service/eas-contracts/contracts/IEAS.sol";
 
-import { OPTIMISM_ATTESTER, EAS } from "src/constants.sol";
+import { EAS } from "src/constants.sol";
 
 contract AnonVoting is SemaphoreVoting {
     error InvalidAttestation(string message);
@@ -20,6 +20,8 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => uint256) public encryptionKey;
     mapping(uint256 => uint256) public decryptionKey;
 
+    mapping(uint256 => mapping(address => bool)) public trustedAttesters;
+    mapping(uint256 => mapping(bytes32 => bool)) public validSchemas;
     mapping(uint256 => uint256[]) internal _votes;
     mapping(uint256 => uint256[]) internal _voters;
 
@@ -28,7 +30,8 @@ contract AnonVoting is SemaphoreVoting {
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
         Attestation memory att = eas.getAttestation(uid);
 
-        if (att.attester != OPTIMISM_ATTESTER) revert InvalidAttestation("Not from trusted attester");
+        if (!validSchemas[pollId][att.schema]) revert InvalidAttestation("Not a valid schema");
+        if (!trustedAttesters[pollId][att.attester]) revert InvalidAttestation("Not from trusted attester");
         if (att.recipient != msg.sender) revert InvalidAttestation("Does not belong to voter");
         if (enrolled[pollId][msg.sender]) revert AlreadyEnrolled(msg.sender, pollId);
 
@@ -64,6 +67,14 @@ contract AnonVoting is SemaphoreVoting {
     function castVote(uint256 vote, uint256 nullifierHash, uint256 pollId, uint256[8] calldata proof) public override {
         super.castVote(vote, nullifierHash, pollId, proof);
         _votes[pollId].push(vote);
+    }
+
+    function setTrustedAttester(uint256 pollId, address attester, bool trusted) external onlyCoordinator(pollId) {
+        trustedAttesters[pollId][attester] = trusted;
+    }
+
+    function setValidSchema(uint256 pollId, bytes32 schema, bool valid) external onlyCoordinator(pollId) {
+        validSchemas[pollId][schema] = valid;
     }
 
     function votes(uint256 pollId) public view returns (uint256[] memory) {
