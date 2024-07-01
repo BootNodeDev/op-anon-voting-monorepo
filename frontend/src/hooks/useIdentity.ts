@@ -17,7 +17,7 @@ const anonVoting = {
 } as const
 
 const MESSAGE = 'BOOT_NODE_ANON_VOTING'
-const MT_DEPTH = 32
+export const MT_DEPTH = 32
 const PASSWORD = ''
 
 export const useIdentity = (pollIdProp: bigint) => {
@@ -33,12 +33,12 @@ export const useIdentity = (pollIdProp: bigint) => {
   }, [pollIdProp])
 
   const makeProof = useCallback(
-    async (vote: bigint) => {
+    async (vote: bigint, voters: bigint[]) => {
       if (!identity) throw Error('no identity')
       const externalNullifier = pollId
 
-      const group = new Group(pollId, MT_DEPTH, [])
-      group.addMember(identity.getCommitment().toString())
+      const group = new Group(pollId, MT_DEPTH, voters)
+      // group.addMember(identity.getCommitment().toString())
 
       const proof = await generateProof(identity, group, externalNullifier, vote)
 
@@ -110,8 +110,8 @@ export const useIdentity = (pollIdProp: bigint) => {
   }, [pollId, writeContractAsync])
 
   const castVote = useCallback(
-    async (vote: number) => {
-      const semaphoreProof = await makeProof(BigInt(vote))
+    async (vote: number, voters: bigint[]) => {
+      const semaphoreProof = await makeProof(BigInt(vote), voters)
 
       fetch('/api/castVote', {
         method: 'POST',

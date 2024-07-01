@@ -1,8 +1,9 @@
 import type { NextPage } from 'next'
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 import styled from 'styled-components'
 
-import { Address as ViemAddress } from 'viem'
+import { Address } from 'viem'
+import { useAccount } from 'wagmi'
 
 import { Button } from '@/src/components/buttons/Button'
 import { BaseCard } from '@/src/components/common/BaseCard'
@@ -12,10 +13,15 @@ import { Radiobutton } from '@/src/components/form/Radiobutton'
 import { Textfield } from '@/src/components/form/Textfield'
 import { BigParagraph } from '@/src/components/text/BaseParagraph'
 import { BaseTitle } from '@/src/components/text/BaseTitle'
-import { useIdentity } from '@/src/hooks/useIdentity'
-import { useUidEAS } from '@/src/hooks/useUidEAS'
+import {
+  useReadAnonVotingGetPolls,
+  useWriteAnonVotingCreatePoll,
+  useWriteAnonVotingSetTrustedAttester,
+  useWriteAnonVotingSetValidSchema,
+} from '@/src/hooks/generated/hooks'
+import { useUserAttestation } from '@/src/hooks/useEAS'
+import { MT_DEPTH, useIdentity } from '@/src/hooks/useIdentity'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
-import { Maybe } from '@/types/utils'
 
 const Card = styled(BaseCard)`
   //min-height: 300px;
@@ -95,30 +101,44 @@ const DataInput = ({ description, id, label, onChange, value }: DataInputProps) 
   )
 }
 
+enum PollState {
+  Created,
+  Ongoing,
+  Ended,
+}
+
 const Home: NextPage = () => {
-  const { address = '0x', connectWallet, isAppConnected } = useWeb3Connection()
+  const { connectWallet, isAppConnected } = useWeb3Connection()
+  const { address } = useAccount()
   const [pollId, setPollId] = useState('1')
-  const { addVoter, castVote, createIdentity, createPoll, endPoll, identity, startPoll } =
-    useIdentity(BigInt(pollId))
+  const { addVoter, castVote, createIdentity, endPoll, identity, startPoll } = useIdentity(
+    BigInt(pollId),
+  )
 
-  // TOD Move schemaId to envVar
-  const { data: easSubgraphData } = useUidEAS({
-    recipient: address,
-    schemaId: '0xfdcfdad2dbe7489e0ce56b260348b7f14e8365a8a325aef9834818c00d46b31b',
-  })
-
-  const [uid, setUid] = useState<Maybe<ViemAddress>>(null)
   const [vote, setVote] = useState('1')
-  const [coordinator, setCoordinator] = useState<ViemAddress>(address)
+  const [schema, setSchema] = useState(process.env.NEXT_PUBLIC_EAS_SCHEMA ?? '')
+  const [attester, setAttester] = useState(process.env.NEXT_PUBLIC_EAS_ATTESTER ?? '')
+  const [coordinator, setCoordinator] = useState<Address | undefined>(address)
+  const { writeContractAsync: createPoll } = useWriteAnonVotingCreatePoll()
+  const { data: polls } = useReadAnonVotingGetPolls()
+  const { writeContractAsync: setTrustedAttester } = useWriteAnonVotingSetTrustedAttester()
+  const { writeContractAsync: setValidSchema } = useWriteAnonVotingSetValidSchema()
 
-  useEffect(() => {
-    const att = easSubgraphData?.attestations[0]
-    console.log({ att })
-    const newUid = att && att.id && att.recipient === address ? att.id : null
+  console.log(polls)
+  const { error, isAttested, loading, uid } = useUserAttestation()
 
-    setUid(newUid as ViemAddress)
-  }, [address, easSubgraphData?.attestations])
+  console.log({ isAttested, error, loading })
 
+  // TODO move to hook
+  const currentPollIndex = polls?.findIndex((e) => e.id === BigInt(pollId))
+  const pollExists = currentPollIndex !== -1
+  const currentPoll = pollExists && polls && currentPollIndex ? polls[currentPollIndex] : null
+  const voterEnrolled =
+    identity &&
+    currentPoll &&
+    currentPoll.voters.includes(BigInt(identity.getCommitment().toString()))
+
+  console.log(currentPoll)
   return (
     <>
       <Title>
@@ -128,27 +148,6 @@ const Home: NextPage = () => {
       <Card>
         {isAppConnected ? (
           <Wrapper>
-            <IdentityWrapper>
-              <Identity
-                identity={identity && identity.getCommitment().toString()}
-                message="Your identity is:"
-                onGenerate={() => createIdentity()}
-              />
-              {uid && (
-                <Identity
-                  identity={uid}
-                  message="Your attestation id is:"
-                  onGenerate={() => createIdentity()}
-                />
-              )}
-            </IdentityWrapper>
-            <DataInput
-              description="Fill in the coordinator field with an address to create a poll, initiate the voting process, or conclude it."
-              id="coordinator"
-              label="Coordinator"
-              onChange={setCoordinator as Dispatch<SetStateAction<string>>}
-              value={coordinator}
-            />
             <DataInput
               description="Enter the ID of the poll you want to vote for or provide a unique ID to create a new one."
               id="poll-id"
@@ -156,37 +155,137 @@ const Home: NextPage = () => {
               onChange={setPollId}
               value={pollId}
             />
-            <ActionsWrapper>
-              {/* TODO: This button should be disabled if the ID is not available  */}
-              <Button onClick={() => createPoll(coordinator)}>Create Poll</Button>
-              {/* TODO: This button should be disabled if the poll wasn't created and you are not the creator  */}
-              <Button onClick={() => startPoll()}>Start Poll</Button>
-              {/* TODO: This button should be disabled if the poll wasn't created and wasn't initiated and you are not the creator */}
-              <Button onClick={() => endPoll()}>End Poll</Button>
+            {currentPoll ? (
+              <>
+                <BigParagraph>Poll already exists</BigParagraph>
+                <IdentityWrapper>
+                  <Identity
+                    identity={identity && identity.getCommitment().toString()}
+                    message="Your identity is:"
+                    onGenerate={() => createIdentity()}
+                  />
+                  {uid && (
+                    <Identity
+                      identity={uid}
+                      message="Your attestation id is:"
+                      onGenerate={() => createIdentity()}
+                    />
+                  )}
+                </IdentityWrapper>
 
-              <Button
-                disabled={identity === null || uid === null}
-                onClick={() =>
-                  identity && uid && addVoter(identity.getCommitment().toString(), uid)
-                }
-                variant="primaryInverted"
-              >
-                Enroll to vote
-              </Button>
-            </ActionsWrapper>
+                {currentPoll.coordinator === address && (
+                  <ActionsWrapper>
+                    <DataInput
+                      description="Fill in the EAS schema address."
+                      id="schema"
+                      label="Schema"
+                      onChange={setSchema}
+                      value={schema}
+                    />
+                    <DataInput
+                      description="Fill in the EAS attester address."
+                      id="attester"
+                      label="Attester"
+                      onChange={setAttester}
+                      value={attester}
+                    />
+                    <Button
+                      disabled={attester.length !== 42}
+                      onClick={() =>
+                        setTrustedAttester({ args: [BigInt(pollId), attester as Address, true] })
+                      }
+                    >
+                      Set Attester
+                    </Button>
+                    <Button
+                      disabled={schema.length !== 66}
+                      onClick={() =>
+                        setValidSchema({ args: [BigInt(pollId), schema as Address, true] })
+                      }
+                    >
+                      Set Schema
+                    </Button>
+                    <Button
+                      disabled={currentPoll.state !== PollState.Created}
+                      onClick={() => startPoll()}
+                    >
+                      Start Poll
+                    </Button>
+                    <Button
+                      disabled={currentPoll.state !== PollState.Ongoing}
+                      onClick={() => endPoll()}
+                    >
+                      End Poll
+                    </Button>
+                  </ActionsWrapper>
+                )}
 
-            <VoteWrapper>
-              <RadioButtonsWrapper>
-                <Radiobutton checked={vote === '1'} onClick={() => setVote('1')}>
-                  Yes
-                </Radiobutton>
-                <Radiobutton checked={vote === '0'} onClick={() => setVote('0')}>
-                  No
-                </Radiobutton>
-              </RadioButtonsWrapper>
-              {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
-              <BigButton onClick={() => castVote(+vote)}>Cast Vote</BigButton>
-            </VoteWrapper>
+                {!voterEnrolled ? (
+                  <Button
+                    disabled={
+                      identity === null || uid === null || currentPoll.state !== PollState.Created
+                    }
+                    onClick={() =>
+                      identity && uid && addVoter(identity.getCommitment().toString(), uid)
+                    }
+                    variant="primaryInverted"
+                  >
+                    Enroll to vote
+                  </Button>
+                ) : (
+                  <VoteWrapper>
+                    <RadioButtonsWrapper>
+                      <Radiobutton checked={vote === '1'} onClick={() => setVote('1')}>
+                        {`Yes ${currentPoll.votes.reduce((acc, curr) => {
+                          acc += curr.toString() == '1' ? BigInt(1) : BigInt(0)
+                          console.log(curr.toString(), acc)
+
+                          return acc
+                        }, BigInt(0))}`}
+                      </Radiobutton>
+                      <Radiobutton checked={vote === '0'} onClick={() => setVote('0')}>
+                        {`No ${currentPoll.votes.reduce((acc, curr) => {
+                          acc += curr.toString() == '0' ? BigInt(1) : BigInt(0)
+                          console.log(curr.toString(), acc)
+
+                          return acc
+                        }, BigInt(0))}`}
+                      </Radiobutton>
+                    </RadioButtonsWrapper>
+                    {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
+                    <BigButton
+                      disabled={currentPoll.state !== PollState.Ongoing}
+                      onClick={() => castVote(+vote, currentPoll.voters as bigint[])}
+                    >
+                      Cast Vote
+                    </BigButton>
+                  </VoteWrapper>
+                )}
+              </>
+            ) : (
+              <>
+                <DataInput
+                  description="Fill in the coordinator field with an address to create a poll. After the poll is created, the coordinator must set the valid schema and attester."
+                  id="coordinator"
+                  label="Coordinator"
+                  onChange={setCoordinator as Dispatch<SetStateAction<string>>}
+                  value={coordinator ?? ''}
+                />
+
+                <ActionsWrapper>
+                  <Button
+                    disabled={coordinator === undefined || coordinator.length === 0}
+                    onClick={() =>
+                      createPoll({
+                        args: [BigInt(pollId), coordinator!, BigInt(MT_DEPTH)],
+                      })
+                    }
+                  >
+                    Create Poll
+                  </Button>
+                </ActionsWrapper>
+              </>
+            )}
           </Wrapper>
         ) : (
           <NotConnected>

@@ -11,7 +11,6 @@ export const RPCProvidersENV: Record<RPCProviders, string | undefined> = {
   infura: process.env.NEXT_PUBLIC_INFURA_TOKEN,
   alchemy: process.env.NEXT_PUBLIC_ALCHEMY_TOKEN,
 }
-
 export type IntrinsicElements<H extends HTMLElement = HTMLElement> = DetailedHTMLProps<
   HTMLAttributes<H>,
   H
