@@ -32,6 +32,10 @@ export const useIdentity = (pollIdProp: bigint) => {
     setPollId(pollIdProp)
   }, [pollIdProp])
 
+  useEffect(() => {
+    setIdentity(null)
+  }, [address])
+
   const makeProof = useCallback(
     async (vote: bigint, voters: bigint[]) => {
       if (!identity) throw Error('no identity')
