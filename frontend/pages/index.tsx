@@ -10,6 +10,7 @@ import { Identity } from '@/src/components/common/Identity'
 import { Formfield } from '@/src/components/form/Formfield'
 import { Radiobutton } from '@/src/components/form/Radiobutton'
 import { Textfield } from '@/src/components/form/Textfield'
+import { SidebarLayout } from '@/src/components/layout/SidebarLayout'
 import { BigParagraph } from '@/src/components/text/BaseParagraph'
 import { BaseTitle } from '@/src/components/text/BaseTitle'
 import { useIdentity } from '@/src/hooks/useIdentity'
@@ -127,67 +128,69 @@ const Home: NextPage = () => {
       </Title>
       <Card>
         {isAppConnected ? (
-          <Wrapper>
-            <IdentityWrapper>
-              <Identity
-                identity={identity && identity.getCommitment().toString()}
-                message="Your identity is:"
-                onGenerate={() => createIdentity()}
-              />
-              {uid && (
+          <SidebarLayout sidebarPlacement="right">
+            <Wrapper>
+              <IdentityWrapper>
                 <Identity
-                  identity={uid}
-                  message="Your attestation id is:"
+                  identity={identity && identity.getCommitment().toString()}
+                  message="Your identity is:"
                   onGenerate={() => createIdentity()}
                 />
-              )}
-            </IdentityWrapper>
-            <DataInput
-              description="Fill in the coordinator field with an address to create a poll, initiate the voting process, or conclude it."
-              id="coordinator"
-              label="Coordinator"
-              onChange={setCoordinator as Dispatch<SetStateAction<string>>}
-              value={coordinator}
-            />
-            <DataInput
-              description="Enter the ID of the poll you want to vote for or provide a unique ID to create a new one."
-              id="poll-id"
-              label="Poll ID"
-              onChange={setPollId}
-              value={pollId}
-            />
-            <ActionsWrapper>
-              {/* TODO: This button should be disabled if the ID is not available  */}
-              <Button onClick={() => createPoll(coordinator)}>Create Poll</Button>
-              {/* TODO: This button should be disabled if the poll wasn't created and you are not the creator  */}
-              <Button onClick={() => startPoll()}>Start Poll</Button>
-              {/* TODO: This button should be disabled if the poll wasn't created and wasn't initiated and you are not the creator */}
-              <Button onClick={() => endPoll()}>End Poll</Button>
+                {uid && (
+                  <Identity
+                    identity={uid}
+                    message="Your attestation id is:"
+                    onGenerate={() => createIdentity()}
+                  />
+                )}
+              </IdentityWrapper>
+              <DataInput
+                description="Fill in the coordinator field with an address to create a poll, initiate the voting process, or conclude it."
+                id="coordinator"
+                label="Coordinator"
+                onChange={setCoordinator as Dispatch<SetStateAction<string>>}
+                value={coordinator}
+              />
+              <DataInput
+                description="Enter the ID of the poll you want to vote for or provide a unique ID to create a new one."
+                id="poll-id"
+                label="Poll ID"
+                onChange={setPollId}
+                value={pollId}
+              />
+              <ActionsWrapper>
+                {/* TODO: This button should be disabled if the ID is not available  */}
+                <Button onClick={() => createPoll(coordinator)}>Create Poll</Button>
+                {/* TODO: This button should be disabled if the poll wasn't created and you are not the creator  */}
+                <Button onClick={() => startPoll()}>Start Poll</Button>
+                {/* TODO: This button should be disabled if the poll wasn't created and wasn't initiated and you are not the creator */}
+                <Button onClick={() => endPoll()}>End Poll</Button>
 
-              <Button
-                disabled={identity === null || uid === null}
-                onClick={() =>
-                  identity && uid && addVoter(identity.getCommitment().toString(), uid)
-                }
-                variant="primaryInverted"
-              >
-                Enroll to vote
-              </Button>
-            </ActionsWrapper>
+                <Button
+                  disabled={identity === null || uid === null}
+                  onClick={() =>
+                    identity && uid && addVoter(identity.getCommitment().toString(), uid)
+                  }
+                  variant="primaryInverted"
+                >
+                  Enroll to vote
+                </Button>
+              </ActionsWrapper>
 
-            <VoteWrapper>
-              <RadioButtonsWrapper>
-                <Radiobutton checked={vote === '1'} onClick={() => setVote('1')}>
-                  Yes
-                </Radiobutton>
-                <Radiobutton checked={vote === '0'} onClick={() => setVote('0')}>
-                  No
-                </Radiobutton>
-              </RadioButtonsWrapper>
-              {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
-              <BigButton onClick={() => castVote(+vote)}>Cast Vote</BigButton>
-            </VoteWrapper>
-          </Wrapper>
+              <VoteWrapper>
+                <RadioButtonsWrapper>
+                  <Radiobutton checked={vote === '1'} onClick={() => setVote('1')}>
+                    Yes
+                  </Radiobutton>
+                  <Radiobutton checked={vote === '0'} onClick={() => setVote('0')}>
+                    No
+                  </Radiobutton>
+                </RadioButtonsWrapper>
+                {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
+                <BigButton onClick={() => castVote(+vote)}>Cast Vote</BigButton>
+              </VoteWrapper>
+            </Wrapper>
+          </SidebarLayout>
         ) : (
           <NotConnected>
             <BigParagraph>

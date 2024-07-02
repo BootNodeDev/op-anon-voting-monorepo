@@ -1,59 +1,70 @@
-import { useState } from 'react'
 import styled from 'styled-components'
 
-import { BaseCard } from '@/src/components/common/BaseCard'
-import { Checkbox } from '@/src/components/form/Checkbox'
-import { Radiobutton } from '@/src/components/form/Radiobutton'
-import { Textfield } from '@/src/components/form/Textfield'
-import { BaseParagraph } from '@/src/components/text/BaseParagraph'
-
-const Wrapper = styled(BaseCard)`
-  max-width: 100%;
-`
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: column;
-  row-gap: 10px;
-  margin: 0 0 30px;
-
-  &:last-child {
-    margin-bottom: 0;
+const Wrapper = styled.aside`
+  padding: ${({ theme: { card } }) => card.paddingVertical}
+    calc(${({ theme: { card } }) => card.paddingHorizontal} / 2);
+  border-top: 1px solid ${({ theme: { colors } }) => colors.borderColor};
+  @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
+    padding: 16px;
+    border-top: none;
+    border-left: 1px solid ${({ theme: { colors } }) => colors.borderColor};
+  }
+  ol {
+    margin: 8px 0 16px;
+    padding: 0 0 0 0px;
+    li {
+      list-style-position: inside;
+      font-size: 1.3rem;
+      &:not(:last-child) {
+        margin-bottom: 4px;
+      }
+    }
   }
 `
 
-export const Sidebar: React.FC = ({ ...restProps }) => {
-  const [radioButton, setRadioButton] = useState<'one' | 'two' | 'three' | undefined>()
+const Title = styled.div`
+  font-weight: 600;
+`
 
+export const Sidebar: React.FC = ({ ...restProps }) => {
   return (
     <Wrapper {...restProps}>
-      <Row>
-        <BaseParagraph>Add something here:</BaseParagraph>
-        <Textfield placeholder="Come on..." />
-      </Row>
-      <Row>
-        <BaseParagraph>Radio Buttons!</BaseParagraph>
-        <Radiobutton checked={radioButton === 'one'} onClick={() => setRadioButton('one')}>
-          One
-        </Radiobutton>
-        <Radiobutton checked={radioButton === 'two'} onClick={() => setRadioButton('two')}>
-          Two
-        </Radiobutton>
-        <Radiobutton checked={radioButton === 'three'} onClick={() => setRadioButton('three')}>
-          Three
-        </Radiobutton>
-      </Row>
-      <Row>
-        <BaseParagraph>Checkboxes!</BaseParagraph>
-        <Checkbox
-          checked={true}
-          onClick={(isCheckboxOneChecked) => console.log({ isCheckboxOneChecked })}
-        >
-          One
-        </Checkbox>
-        <Checkbox disabled>Two</Checkbox>
-        <Checkbox>Three</Checkbox>
-      </Row>
+      <div>
+        <Title>Create, Start and End a Poll </Title>
+        <ol>
+          <li>Provide a unique Poll ID</li>
+          <li>Set a coordinator to govern the lifecycle of the poll</li>
+          <li>Click on Create Poll</li>
+          <li>Refresh and search for the Poll you created</li>
+          <li>Click on Generate Identity</li>
+          <li>Set a desired Schema, and click on Set Schema</li>
+          <li>Set a valid Attester, and click on Set Attester</li>
+          <li>
+            Now the Poll is open to enrollment. Users have to enroll at this stage to be able to
+            vote.
+          </li>
+          <li>Click on Start Poll to enable voting for the enrolled users</li>
+          <li>Once the voting is completed, the coordinator can End Poll</li>
+        </ol>
+      </div>
+      <div>
+        <Title>Enroll to vote</Title>
+        <ol>
+          <li>Search for a Poll using its unique ID</li>
+          <li>Click on Generate Identity</li>
+          <li>If your address is attested under the correct Schema, you can enroll to vote.</li>
+          <li>Click on Enroll to vote</li>
+        </ol>
+      </div>
+      <div>
+        <Title>Vote</Title>
+        <ol>
+          <li>Search for a Poll using its unique ID</li>
+          <li>Enrolled users can only vote after the poll started</li>
+          <li>Generate identity</li>
+          <li>Select your vote and click on Cast Vote</li>
+        </ol>
+      </div>
     </Wrapper>
   )
 }
