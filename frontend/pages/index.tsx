@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { Address } from 'viem'
@@ -116,6 +116,16 @@ const Home: NextPage = () => {
   )
 
   const [vote, setVote] = useState('1')
+
+  // TODO Move to useQuery
+  const [castVoteLoading, setCastVoteLoading] = useState(false)
+  const [castVoteError, setCastVoteError] = useState(false)
+
+  useEffect(() => {
+    setCastVoteError(false)
+    setCastVoteLoading(false)
+  }, [address, pollId])
+
   const [schema, setSchema] = useState(process.env.NEXT_PUBLIC_EAS_SCHEMA ?? '')
   const [attester, setAttester] = useState(process.env.NEXT_PUBLIC_EAS_ATTESTER ?? '')
   const [coordinator, setCoordinator] = useState<Address | undefined>(address)
@@ -254,8 +264,17 @@ const Home: NextPage = () => {
                     </RadioButtonsWrapper>
                     {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
                     <BigButton
-                      disabled={currentPoll.state !== PollState.Ongoing}
-                      onClick={() => castVote(+vote, currentPoll.voters as bigint[])}
+                      disabled={
+                        currentPoll.state !== PollState.Ongoing || castVoteLoading || castVoteError
+                      }
+                      onClick={() => {
+                        setCastVoteLoading(true)
+                        castVote(+vote, currentPoll.voters as bigint[])
+                          .finally(() => setCastVoteLoading(false))
+                          .catch(() => {
+                            setCastVoteError(true)
+                          })
+                      }}
                     >
                       Cast Vote
                     </BigButton>

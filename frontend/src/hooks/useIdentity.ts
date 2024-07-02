@@ -117,14 +117,12 @@ export const useIdentity = (pollIdProp: bigint) => {
     async (vote: number, voters: bigint[]) => {
       const semaphoreProof = await makeProof(BigInt(vote), voters)
 
-      fetch('/api/castVote', {
+      await fetch('/api/castVote', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ vote, semaphoreProof }),
-      }).catch((e) => {
-        console.error(e)
       })
     },
     [makeProof],
