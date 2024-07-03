@@ -1,7 +1,6 @@
 import { Maybe } from 'graphql/jsutils/Maybe'
 
 import { IdentityWrapper } from './Poll'
-
 import { Identity } from '@/src/components/common/Identity'
 
 type UserIdProps = {

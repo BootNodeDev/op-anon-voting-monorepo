@@ -5,7 +5,6 @@ import { Address } from 'viem'
 import { ActionsWrapper } from './Poll'
 import { Button } from '../buttons/Button'
 import { DataInput } from '../form/DataInput'
-
 import { PASSWORD } from '@/src/constants/common'
 import {
   useWriteAnonVotingEndPoll,

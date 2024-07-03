@@ -4,7 +4,6 @@ import { Identity } from '@semaphore-protocol/identity'
 
 import { BigButton, RadioButtonsWrapper, VoteWrapper } from './Poll'
 import { Radiobutton } from '../form/Radiobutton'
-
 import { useCastVote } from '@/src/hooks/useCastVote'
 import { Poll, useCurrentPoll } from '@/src/hooks/useCurrentPoll'
 import { PollVote } from '@/types/polls'
@@ -30,10 +29,10 @@ export const Votes = ({ canVote, currentPoll, identity, result, votes }: VotesPr
       <VoteWrapper>
         <RadioButtonsWrapper>
           <Radiobutton checked={vote === PollVote.Yes} onClick={() => setVote(PollVote.Yes)}>
-            {`Yes ${votes[PollVote.Yes]}`}
+            {`Yes (${votes[PollVote.Yes]})`}
           </Radiobutton>
           <Radiobutton checked={vote === PollVote.No} onClick={() => setVote(PollVote.No)}>
-            {`No ${votes[PollVote.No]}`}
+            {`No (${votes[PollVote.No]})`}
           </Radiobutton>
           <p>Winner is {result}</p>
         </RadioButtonsWrapper>

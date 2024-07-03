@@ -1,7 +1,6 @@
 import { Address } from 'viem'
 
 import { Button } from '../buttons/Button'
-
 import { useWriteAnonVotingAddVoter } from '@/src/hooks/generated/hooks'
 import { Poll } from '@/src/hooks/useCurrentPoll'
 import { PollState } from '@/types/polls'

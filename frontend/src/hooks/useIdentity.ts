@@ -4,7 +4,6 @@ import { Identity } from '@semaphore-protocol/identity'
 import { useSignMessage } from 'wagmi'
 
 import { MESSAGE_TO_SIGN } from '../constants/common'
-
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 
 const BaseState = { identity: null, state: 'idle', publicIdentity: undefined }

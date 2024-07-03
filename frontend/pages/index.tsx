@@ -1,6 +1,9 @@
 import type { NextPage } from 'next'
+import { useState } from 'react'
 
+import { ButtonDropdown } from '@/src/components/buttons/ButtonDropdown'
 import { AdminPoll } from '@/src/components/common/AdminPoll'
+import { DropdownItem } from '@/src/components/common/Dropdown'
 import {
   BigButton,
   Card,
@@ -15,17 +18,15 @@ import { PollEnrollment } from '@/src/components/common/PollEnrollment'
 import { UserId } from '@/src/components/common/UserId'
 import { Votes } from '@/src/components/common/Votes'
 import { DataInput } from '@/src/components/form/DataInput'
+import { Radiobutton } from '@/src/components/form/Radiobutton'
 import { BigParagraph } from '@/src/components/text/BaseParagraph'
+import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useReadAnonVotingGetPolls } from '@/src/hooks/generated/hooks'
 import { useCurrentPoll, useCurrentPollProps } from '@/src/hooks/useCurrentPoll'
 import { useUserAttestation } from '@/src/hooks/useEAS'
 import { useIdentity } from '@/src/hooks/useIdentity'
 import { usePollId } from '@/src/hooks/usePollId'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
-import { useState } from 'react'
-import { Radiobutton } from '@/src/components/form/Radiobutton'
-import { DropdownItem } from '@/src/components/common/Dropdown'
-import { ButtonDropdown } from '@/src/components/buttons/ButtonDropdown'
 
 type PollForm = 'CREATE_POLL' | 'USE_POLL'
 
@@ -80,6 +81,7 @@ const Home: NextPage = () => {
             </Row>
             {pollForm === 'USE_POLL' ? (
               <>
+                <PageTitle>Select an existing poll</PageTitle>
                 <WrapperDropdown
                   dropdownButton={
                     <ButtonDropdown>
@@ -106,7 +108,6 @@ const Home: NextPage = () => {
                 ></WrapperDropdown>
                 {currentPoll ? (
                   <>
-                    <BigParagraph>Poll already exists</BigParagraph>
                     <UserId
                       createIdentity={createIdentity}
                       loading={loadingAttestation || identityCreationState === 'pending'}

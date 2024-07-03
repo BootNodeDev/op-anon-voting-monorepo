@@ -6,7 +6,6 @@ import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 import { ActionsWrapper } from './Poll'
 import { Button } from '../buttons/Button'
 import { DataInput } from '../form/DataInput'
-
 import { MT_DEPTH } from '@/src/constants/common'
 import { ZEROn } from '@/src/constants/numbers'
 import { useWriteAnonVotingCreatePoll } from '@/src/hooks/generated/hooks'

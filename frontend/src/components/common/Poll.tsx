@@ -1,9 +1,9 @@
 import styled from 'styled-components'
 
+import { Dropdown } from './Dropdown'
 import { Button } from '@/src/components/buttons/Button'
 import { BaseCard } from '@/src/components/common/BaseCard'
 import { BaseTitle } from '@/src/components/text/BaseTitle'
-import { Dropdown } from './Dropdown'
 
 export const Card = styled(BaseCard)`
   //min-height: 300px;
@@ -68,7 +68,8 @@ export const Row = styled.div`
 
 export const WrapperDropdown = styled(Dropdown)`
   --inner-padding: 8px;
-
+  width: 100%;
+  display: flex;
   .dropdownItems {
     max-height: 340px;
     overflow: auto;
