@@ -12,7 +12,7 @@
     "wagmiGenerate": "yarn wagmi generate",
     "start": "next start",
     "generate": "graphql-codegen",
-    "postinstall": "yarn generate"
+    "postinstall": "yarn generate; yarn wagmiGenerate"
   },
   "dependencies": {
     "@apollo/client": "^3.10.5",

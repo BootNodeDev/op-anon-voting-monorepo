@@ -1,6 +1,6 @@
 import { defineConfig } from '@wagmi/cli'
 import { etherscan, react } from '@wagmi/cli/plugins'
-import { erc20Abi } from 'viem'
+import { Address, erc20Abi } from 'viem'
 import { optimism, optimismSepolia } from 'wagmi/chains'
 
 import env from './src/config/env.server'
@@ -19,9 +19,9 @@ const config = defineConfig({
       chainId: optimism.id,
       contracts: [
         {
-          name: 'ApeNFT',
+          name: 'AnonVoting',
           address: {
-            [optimism.id]: '0x0deaAc29d8A3d4EbBAAa3eCd3cC97C9deF00f720',
+            [optimism.id]: process.env.NEXT_PUBLIC_ANON_VOTING_ADDRESS as Address,
           },
         },
         {
