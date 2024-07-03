@@ -10,7 +10,7 @@ export const FormStatus = styled.div<{ status?: TextfieldStatus }>`
       ? textField.successColor
       : colors.textColor};
   display: block;
-  font-size: 1rem;
+  font-size: 1.4rem;
   font-weight: 400;
   line-height: 1.2;
   white-space: nowrap;

@@ -29,13 +29,10 @@ const Description = styled.p`
   margin: 0;
   font-size: 1.4rem;
   opacity: 0.8;
+  color: ${({ theme: { colors } }) => colors.textColor};
 `
 
-const FormStatus = styled(BaseFormStatus)`
-  left: 3px;
-  position: absolute;
-  top: calc(100% + 4px);
-`
+const FormStatus = styled(BaseFormStatus)``
 
 export const Formfield: React.FC<{
   description?: string
