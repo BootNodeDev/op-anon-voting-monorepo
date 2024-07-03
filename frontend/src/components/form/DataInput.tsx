@@ -10,12 +10,21 @@ type DataInputProps = {
   id: string
   label: string
   description?: string
+  initialValue: string
   error?: Maybe<string>
 }
 
 // TODO This does the same as `FormField` ?
-export const DataInput = ({ description, error, id, label, onChange, value }: DataInputProps) => {
-  const [internalValue, setInternalValue] = useState('')
+export const DataInput = ({
+  description,
+  error,
+  id,
+  initialValue,
+  label,
+  onChange,
+  value,
+}: DataInputProps) => {
+  const [internalValue, setInternalValue] = useState(initialValue)
 
   const handleChange = useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {

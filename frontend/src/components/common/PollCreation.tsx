@@ -10,7 +10,7 @@ import { DataInput } from '../form/DataInput'
 import { MT_DEPTH } from '@/src/constants/common'
 import { useWriteAnonVotingCreatePoll } from '@/src/hooks/generated/hooks'
 
-type PollCreationProps = { pollId: bigint; onSuccess: () => void }
+type PollCreationProps = { pollId: Maybe<bigint>; onSuccess: () => void }
 export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
   const { address } = useAccount()
   const [coordinator, setCoordinator] = useState<Address | undefined>(address)
@@ -26,6 +26,7 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
       <DataInput
         description="Fill in the coordinator field with an address to create a poll. After the poll is created, the coordinator must set the valid schema and attester."
         id="coordinator"
+        initialValue={address ?? ''}
         label="Coordinator"
         onChange={setCoordinator as Dispatch<SetStateAction<string>>}
         value={coordinator ?? ''}
@@ -33,7 +34,7 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
 
       <ActionsWrapper>
         <Button
-          disabled={coordinator === undefined || coordinator.length === 0}
+          disabled={coordinator === undefined || coordinator.length === 0 || pollId === null}
           onClick={() =>
             createPoll({
               args: [pollId, coordinator!, BigInt(MT_DEPTH)],

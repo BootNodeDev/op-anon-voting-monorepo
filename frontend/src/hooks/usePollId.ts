@@ -14,6 +14,7 @@ export const usePollId = (): usePollIdReturnType => {
 
   const handleChangePollId = useCallback((input: string) => {
     try {
+      console.log(input, 'input')
       const newPollId = BigInt(input)
       setState({ pollId: newPollId, error: null })
     } catch (e) {
@@ -21,5 +22,6 @@ export const usePollId = (): usePollIdReturnType => {
     }
   }, [])
 
+  console.log({ ...state })
   return { ...state, handleChangePollId }
 }

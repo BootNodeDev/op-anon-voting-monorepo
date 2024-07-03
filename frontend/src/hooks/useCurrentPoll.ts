@@ -22,6 +22,7 @@ export type useCurrentPollProps = {
 export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPollProps) => {
   const { address } = useAccount()
 
+  console.log(pollId)
   const currentPoll = useMemo(() => {
     if (polls && pollId) {
       return polls.find((e) => e.id === pollId)

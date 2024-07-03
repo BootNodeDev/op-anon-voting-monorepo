@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Button } from '@/src/components/buttons/Button'
 import { BaseCard } from '@/src/components/common/BaseCard'
 import { BaseTitle } from '@/src/components/text/BaseTitle'
+import { Dropdown } from './Dropdown'
 
 export const Card = styled(BaseCard)`
   //min-height: 300px;
@@ -52,4 +53,24 @@ export const RadioButtonsWrapper = styled.div`
   gap: 8px;
   padding: 16px 0;
   width: 100%;
+`
+
+export const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  row-gap: 10px;
+  margin: 0 0 30px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`
+
+export const WrapperDropdown = styled(Dropdown)`
+  --inner-padding: 8px;
+
+  .dropdownItems {
+    max-height: 340px;
+    overflow: auto;
+  }
 `
