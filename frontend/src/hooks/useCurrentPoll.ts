@@ -31,6 +31,7 @@ export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPoll
     }
   }, [pollId, polls])
 
+  // TODO Remove useMemo for fast calculations
   const isEnrolled = useMemo(() => {
     return !!currentPoll && !!publicIdentity && currentPoll.voters.includes(publicIdentity)
   }, [currentPoll, publicIdentity])

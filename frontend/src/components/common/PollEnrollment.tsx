@@ -25,7 +25,7 @@ export const PollEnrollment = ({
     writeContractAsync: addVoter,
   } = useWriteAnonVotingAddVoter()
 
-  return isEnrolled ? (
+  return !isEnrolled ? (
     <Button
       disabled={
         isEnrolled ||

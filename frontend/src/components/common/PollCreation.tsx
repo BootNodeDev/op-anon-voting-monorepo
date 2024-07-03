@@ -1,30 +1,47 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Address } from 'viem'
-import { useAccount } from 'wagmi'
+import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 
 import { ActionsWrapper } from './Poll'
 import { Button } from '../buttons/Button'
 import { DataInput } from '../form/DataInput'
 
 import { MT_DEPTH } from '@/src/constants/common'
+import { ZEROn } from '@/src/constants/numbers'
 import { useWriteAnonVotingCreatePoll } from '@/src/hooks/generated/hooks'
+import { Maybe } from '@/types/utils'
 
 type PollCreationProps = { pollId: Maybe<bigint>; onSuccess: () => void }
 export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
   const { address } = useAccount()
   const [coordinator, setCoordinator] = useState<Address | undefined>(address)
   const {
+    data: hash,
+    error: createPollError,
     isError: isErrorCreatePoll,
     isPending: isPendingCreatePoll,
     isSuccess: isSuccessCreatePoll,
+    // reset,
+    status,
     writeContractAsync: createPoll,
   } = useWriteAnonVotingCreatePoll()
 
+  console.log(hash)
+  const { isSuccess, status: status2 } = useWaitForTransactionReceipt({ hash, confirmations: 1 })
+
+  useEffect(() => {
+    if (isSuccess) {
+      onSuccess()
+    }
+  }, [isSuccess, onSuccess])
+
+  console.log({ status, status2, createPollError })
   return (
     <>
       <DataInput
         description="Fill in the coordinator field with an address to create a poll. After the poll is created, the coordinator must set the valid schema and attester."
+        error={isErrorCreatePoll ? 'Error creating poll' : null}
         id="coordinator"
         initialValue={address ?? ''}
         label="Coordinator"
@@ -34,11 +51,18 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
 
       <ActionsWrapper>
         <Button
-          disabled={coordinator === undefined || coordinator.length === 0 || pollId === null}
-          onClick={() =>
-            createPoll({
-              args: [pollId, coordinator!, BigInt(MT_DEPTH)],
-            }).then(onSuccess)
+          disabled={
+            coordinator === undefined ||
+            coordinator.length === 0 ||
+            pollId === null ||
+            pollId === ZEROn
+          }
+          onClick={
+            () =>
+              createPoll({
+                args: [pollId as bigint, coordinator!, BigInt(MT_DEPTH)],
+              }).catch(() => {})
+            // .finally(reset)
           }
         >
           Create Poll

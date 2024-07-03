@@ -24,10 +24,11 @@ import { usePollId } from '@/src/hooks/usePollId'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { useState } from 'react'
 import { Radiobutton } from '@/src/components/form/Radiobutton'
-import { Dropdown, DropdownItem } from '@/src/components/common/Dropdown'
+import { DropdownItem } from '@/src/components/common/Dropdown'
 import { ButtonDropdown } from '@/src/components/buttons/ButtonDropdown'
 
 type PollForm = 'CREATE_POLL' | 'USE_POLL'
+
 const Home: NextPage = () => {
   const { connectWallet, isAppConnected } = useWeb3Connection()
   const { error: pollIdError, handleChangePollId, pollId } = usePollId()
@@ -148,7 +149,10 @@ const Home: NextPage = () => {
                   onChange={handleChangePollId}
                   value={pollId ? pollId.toString() : ''}
                 />
-                <PollCreation onSuccess={getPolls} pollId={pollId} />
+                <PollCreation
+                  onSuccess={() => getPolls().then(() => setPollForm('USE_POLL'))}
+                  pollId={pollId}
+                />
               </>
             ) : (
               <div>invalid form option</div>

@@ -43,6 +43,7 @@ export const AdminPoll = ({ canEnd, canStart, pollId }: AdminPollProps) => {
       <DataInput
         description="Fill in the EAS schema address."
         id="schema"
+        initialValue=""
         label="Schema"
         onChange={setSchema}
         value={schema}
@@ -50,6 +51,7 @@ export const AdminPoll = ({ canEnd, canStart, pollId }: AdminPollProps) => {
       <DataInput
         description="Fill in the EAS attester address."
         id="attester"
+        initialValue=""
         label="Attester"
         onChange={setAttester}
         value={attester}
