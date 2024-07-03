@@ -8,17 +8,16 @@ import {
   BigButton,
   Card,
   NotConnected,
-  Row,
   Title,
   Wrapper,
   WrapperDropdown,
 } from '@/src/components/common/Poll'
 import { PollCreation } from '@/src/components/common/PollCreation'
 import { PollEnrollment } from '@/src/components/common/PollEnrollment'
+import { Tab, TabsWrapper } from '@/src/components/common/Tab'
 import { UserId } from '@/src/components/common/UserId'
 import { Votes } from '@/src/components/common/Votes'
 import { DataInput } from '@/src/components/form/DataInput'
-import { Radiobutton } from '@/src/components/form/Radiobutton'
 import { BigParagraph } from '@/src/components/text/BaseParagraph'
 import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useReadAnonVotingGetPolls } from '@/src/hooks/generated/hooks'
@@ -61,8 +60,8 @@ const Home: NextPage = () => {
       <Card>
         {isAppConnected ? (
           <Wrapper>
-            <Row>
-              <Radiobutton
+            <TabsWrapper>
+              <Tab
                 checked={pollForm === 'CREATE_POLL'}
                 onClick={() => {
                   setPollForm('CREATE_POLL')
@@ -70,15 +69,16 @@ const Home: NextPage = () => {
                 }}
               >
                 Create Poll
-              </Radiobutton>
-              <Radiobutton
+              </Tab>
+              <Tab
                 checked={pollForm === 'USE_POLL'}
                 disabled={!polls || polls.length === 0}
                 onClick={() => setPollForm('USE_POLL')}
               >
-                Use existing poll
-              </Radiobutton>
-            </Row>
+                Vote/edit poll
+              </Tab>
+            </TabsWrapper>
+
             {pollForm === 'USE_POLL' ? (
               <>
                 <PageTitle>Select an existing poll</PageTitle>

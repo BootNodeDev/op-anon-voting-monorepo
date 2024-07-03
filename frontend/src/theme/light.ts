@@ -133,6 +133,14 @@ export const light = {
     backgroundColor: white,
     borderColor: white,
   },
+  tab: {
+    BorderColorActive: primary,
+    BorderColor: lighterGray,
+    backgroundColorActive: white,
+    backgroundColor: white,
+    textColor: gray,
+    textColorActive: primary,
+  },
   onBoard: {
     backgroundColor: componentBackgroundColor,
     color: textColor,
