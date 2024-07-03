@@ -4,13 +4,9 @@ import { ObjectValues, RPCProviders, RPCProvidersENV } from '@/types/utils'
 export const providerChains: Record<RPCProviders, Record<ChainNames, string>> = {
   infura: {
     'OP Mainnet': 'optimism-mainnet',
-    'OP Sepolia': 'optimism-sepolia',
-    Anvil: 'anvil',
   },
   alchemy: {
     'OP Mainnet': 'opt-mainnet',
-    'OP Sepolia': 'opt-sepolia',
-    Anvil: 'anvil',
   },
 }
 
