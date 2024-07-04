@@ -5,6 +5,7 @@ import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 
 import { ActionsWrapper, BigButton } from './Poll'
 import { DataInput } from '../form/DataInput'
+import { AlertMessage } from '@/src/components/common/AlertMessage'
 import { MT_DEPTH } from '@/src/constants/common'
 import { ZEROn } from '@/src/constants/numbers'
 import { useWriteAnonVotingCreatePoll } from '@/src/hooks/generated/hooks'
@@ -46,7 +47,16 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
         onChange={setCoordinator as Dispatch<SetStateAction<string>>}
         value={coordinator ?? ''}
       />
-
+      {isErrorCreatePoll && (
+        <AlertMessage isError={isErrorCreatePoll}>
+          <>Error creating the poll.</>
+        </AlertMessage>
+      )}
+      {isSuccessCreatePoll && (
+        <AlertMessage>
+          <>The poll was created successfully.</>
+        </AlertMessage>
+      )}
       <ActionsWrapper>
         <BigButton
           disabled={
@@ -64,11 +74,8 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
             // .finally(reset)
           }
         >
-          Create Poll
+          {isPendingCreatePoll ? 'The poll is pending creation.' : 'Create Poll'}
         </BigButton>
-        {isErrorCreatePoll && 'error creating poll'}
-        {isPendingCreatePoll && 'is pending creating poll'}
-        {isSuccessCreatePoll && ' success '}
       </ActionsWrapper>
     </>
   )
