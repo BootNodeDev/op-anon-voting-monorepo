@@ -42,7 +42,12 @@ export const DataInput = ({
       <Formfield
         description={description}
         formControl={
-          <Textfield id={id} onChange={handleChange} placeholder={placeholder} value={internalValue} />
+          <Textfield
+            id={id}
+            onChange={handleChange}
+            placeholder={placeholder}
+            value={internalValue}
+          />
         }
         label={label}
         labelFor={label}

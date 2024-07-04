@@ -44,15 +44,15 @@ export const AdminPoll = ({ canEnd, canStart, pollId }: AdminPollProps) => {
         initialValue=""
         label="Schema"
         onChange={setSchema}
-        value={schema}
         placeholder="EAS schema address"
+        value={schema}
       />
       <DataInput
-        placeholder="EAS attester address."
         id="attester"
         initialValue=""
         label="Attester"
         onChange={setAttester}
+        placeholder="EAS attester address."
         value={attester}
       />
 

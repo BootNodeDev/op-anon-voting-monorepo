@@ -31,7 +31,8 @@ export const Votes = ({ canVote, currentPoll, identity, result, votes }: VotesPr
       <VoteWrapper>
         <div>
           <PageTitle>
-            {currentPoll.state === PollState.Ended ? 'Poll has ended' : 'Poll is open'}
+            {currentPoll.state === PollState.Ended && 'Poll has ended'}
+            {currentPoll.state === PollState.Ongoing && 'Poll is open'}
           </PageTitle>
           <BaseParagraph>{result}</BaseParagraph>{' '}
         </div>

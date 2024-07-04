@@ -126,7 +126,7 @@ const Home: NextPage = () => {
                         uid={uid}
                       />
                     )}
-                    {identity && (
+                    {identity && currentPoll.state !== PollState.Created && (
                       <Votes
                         canVote={canVote}
                         currentPoll={currentPoll}
