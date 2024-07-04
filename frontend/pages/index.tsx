@@ -27,8 +27,6 @@ import { useIdentity } from '@/src/hooks/useIdentity'
 import { usePollId } from '@/src/hooks/usePollId'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { PollState } from '@/types/polls'
-import { Link } from '@/src/components/assets/Link'
-import { NavLink } from '@/src/components/navigation/NavLink'
 
 type PollForm = 'CREATE_POLL' | 'USE_POLL'
 
@@ -159,9 +157,9 @@ const Home: NextPage = () => {
                   </BaseParagraph>
                 )}
                 <PollCreation
+                  currentPoll={currentPoll}
                   onSuccess={() => getPolls().then(() => setPollForm('USE_POLL'))}
                   pollId={pollId}
-                  currentPoll={currentPoll}
                 />
               </>
             ) : (
