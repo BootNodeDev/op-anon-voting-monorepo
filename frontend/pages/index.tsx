@@ -69,14 +69,14 @@ const Home: NextPage = () => {
                   handleChangePollId('')
                 }}
               >
-                Create Poll
+                Create poll
               </Tab>
               <Tab
                 checked={pollForm === 'USE_POLL'}
                 disabled={!polls || polls.length === 0}
                 onClick={() => setPollForm('USE_POLL')}
               >
-                Vote Poll
+                Vote/manage poll
               </Tab>
             </TabsWrapper>
 

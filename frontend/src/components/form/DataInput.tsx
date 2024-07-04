@@ -12,6 +12,7 @@ type DataInputProps = {
   description?: string
   initialValue: string
   error?: Maybe<string>
+  placeholder?: string
 }
 
 // TODO This does the same as `FormField` ?
@@ -22,6 +23,7 @@ export const DataInput = ({
   initialValue,
   label,
   onChange,
+  placeholder,
   value,
 }: DataInputProps) => {
   const [internalValue, setInternalValue] = useState(initialValue)
@@ -40,7 +42,7 @@ export const DataInput = ({
       <Formfield
         description={description}
         formControl={
-          <Textfield id={id} onChange={handleChange} placeholder="" value={internalValue} />
+          <Textfield id={id} onChange={handleChange} placeholder={placeholder} value={internalValue} />
         }
         label={label}
         labelFor={label}

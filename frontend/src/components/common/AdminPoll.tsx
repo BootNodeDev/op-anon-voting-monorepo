@@ -40,15 +40,15 @@ export const AdminPoll = ({ canEnd, canStart, pollId }: AdminPollProps) => {
   return (
     <ActionsWrapper>
       <DataInput
-        description="Fill in the EAS schema address."
         id="schema"
         initialValue=""
         label="Schema"
         onChange={setSchema}
         value={schema}
+        placeholder="EAS schema address"
       />
       <DataInput
-        description="Fill in the EAS attester address."
+        placeholder="EAS attester address."
         id="attester"
         initialValue=""
         label="Attester"
