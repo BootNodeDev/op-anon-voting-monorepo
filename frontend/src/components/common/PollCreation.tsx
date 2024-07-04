@@ -3,8 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Address } from 'viem'
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 
-import { ActionsWrapper } from './Poll'
-import { Button } from '../buttons/Button'
+import { ActionsWrapper, BigButton } from './Poll'
 import { DataInput } from '../form/DataInput'
 import { MT_DEPTH } from '@/src/constants/common'
 import { ZEROn } from '@/src/constants/numbers'
@@ -49,12 +48,13 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
       />
 
       <ActionsWrapper>
-        <Button
+        <BigButton
           disabled={
             coordinator === undefined ||
             coordinator.length === 0 ||
             pollId === null ||
-            pollId === ZEROn
+            pollId === ZEROn ||
+            isPendingCreatePoll
           }
           onClick={
             () =>
@@ -65,7 +65,7 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
           }
         >
           Create Poll
-        </Button>
+        </BigButton>
         {isErrorCreatePoll && 'error creating poll'}
         {isPendingCreatePoll && 'is pending creating poll'}
         {isSuccessCreatePoll && ' success '}

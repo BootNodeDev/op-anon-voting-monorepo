@@ -44,7 +44,7 @@ export const VoteWrapper = styled.div`
   display: flex;
   align-items: start;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
 `
 export const RadioButtonsWrapper = styled.div`

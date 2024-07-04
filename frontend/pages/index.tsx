@@ -26,6 +26,7 @@ import { useUserAttestation } from '@/src/hooks/useEAS'
 import { useIdentity } from '@/src/hooks/useIdentity'
 import { usePollId } from '@/src/hooks/usePollId'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
+import { PollState } from '@/types/polls'
 
 type PollForm = 'CREATE_POLL' | 'USE_POLL'
 
@@ -75,7 +76,7 @@ const Home: NextPage = () => {
                 disabled={!polls || polls.length === 0}
                 onClick={() => setPollForm('USE_POLL')}
               >
-                Vote/edit poll
+                Vote Poll
               </Tab>
             </TabsWrapper>
 
@@ -85,7 +86,7 @@ const Home: NextPage = () => {
                 <WrapperDropdown
                   dropdownButton={
                     <ButtonDropdown>
-                      {currentPoll ? <p>{currentPoll.id.toString()}</p> : <p>select</p>}
+                      {currentPoll ? <p>{currentPoll.id.toString()}</p> : <p>Select a poll</p>}
                     </ButtonDropdown>
                   }
                   items={
@@ -106,18 +107,18 @@ const Home: NextPage = () => {
                   }
                   onClick={console.log}
                 ></WrapperDropdown>
+                <UserId
+                  createIdentity={createIdentity}
+                  loading={loadingAttestation || identityCreationState === 'pending'}
+                  publicIdentity={publicIdentity}
+                  uid={uid}
+                />
                 {currentPoll ? (
                   <>
-                    <UserId
-                      createIdentity={createIdentity}
-                      loading={loadingAttestation || identityCreationState === 'pending'}
-                      publicIdentity={publicIdentity}
-                      uid={uid}
-                    />
                     {canAdmin && pollId && (
                       <AdminPoll canEnd={canEndPoll} canStart={canStartPoll} pollId={pollId} />
                     )}
-                    {uid && publicIdentity && (
+                    {uid && publicIdentity && currentPoll.state !== PollState.Ended && (
                       <PollEnrollment
                         currentPoll={currentPoll}
                         isEnrolled={isEnrolled}
@@ -136,7 +137,7 @@ const Home: NextPage = () => {
                     )}
                   </>
                 ) : (
-                  <div>error fetching poll</div>
+                  <div>Please, select a poll</div>
                 )}
               </>
             ) : pollForm === 'CREATE_POLL' ? (

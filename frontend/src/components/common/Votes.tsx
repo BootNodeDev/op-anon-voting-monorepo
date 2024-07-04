@@ -4,9 +4,11 @@ import { Identity } from '@semaphore-protocol/identity'
 
 import { BigButton, RadioButtonsWrapper, VoteWrapper } from './Poll'
 import { Radiobutton } from '../form/Radiobutton'
+import { BaseParagraph } from '@/src/components/text/BaseParagraph'
+import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useCastVote } from '@/src/hooks/useCastVote'
 import { Poll, useCurrentPoll } from '@/src/hooks/useCurrentPoll'
-import { PollVote } from '@/types/polls'
+import { PollState, PollVote } from '@/types/polls'
 
 type VotesProps = Pick<ReturnType<typeof useCurrentPoll>, 'result' | 'votes' | 'canVote'> & {
   currentPoll: Poll
@@ -27,15 +29,29 @@ export const Votes = ({ canVote, currentPoll, identity, result, votes }: VotesPr
   return (
     <>
       <VoteWrapper>
+        <div>
+          <PageTitle>
+            {currentPoll.state === PollState.Ended ? 'Poll has ended' : 'Poll is open'}
+          </PageTitle>
+          <BaseParagraph>{result}</BaseParagraph>{' '}
+        </div>
         <RadioButtonsWrapper>
-          <Radiobutton checked={vote === PollVote.Yes} onClick={() => setVote(PollVote.Yes)}>
+          <Radiobutton
+            checked={vote === PollVote.Yes}
+            ended={currentPoll.state === PollState.Ended}
+            onClick={() => setVote(PollVote.Yes)}
+          >
             {`Yes (${votes[PollVote.Yes]})`}
           </Radiobutton>
-          <Radiobutton checked={vote === PollVote.No} onClick={() => setVote(PollVote.No)}>
+          <Radiobutton
+            checked={vote === PollVote.No}
+            ended={currentPoll.state === PollState.Ended}
+            onClick={() => setVote(PollVote.No)}
+          >
             {`No (${votes[PollVote.No]})`}
           </Radiobutton>
-          <p>Winner is {result}</p>
         </RadioButtonsWrapper>
+
         <BigButton disabled={!canVote || isLoading} onClick={() => castVote}>
           Cast Vote
         </BigButton>

@@ -12,7 +12,7 @@ export type Poll = {
   voters: bigint[]
 }
 
-type VotingResult = 'Tie' | PollVote.Yes | PollVote.No
+type VotingResult = string
 
 export type useCurrentPollProps = {
   polls: Poll[] | undefined
@@ -81,10 +81,10 @@ export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPoll
 
   const result: VotingResult = useMemo(() => {
     return votes[PollVote.Yes] > votes[PollVote.No]
-      ? PollVote.Yes
+      ? 'Winner is yes'
       : votes[PollVote.Yes] < votes[PollVote.No]
-      ? PollVote.No
-      : 'Tie'
+      ? 'Winner is No'
+      : 'The result is a tie'
   }, [votes])
 
   return {

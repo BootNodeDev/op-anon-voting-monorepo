@@ -55,17 +55,18 @@ export const AdminPoll = ({ canEnd, canStart, pollId }: AdminPollProps) => {
         onChange={setAttester}
         value={attester}
       />
-      <Button
-        disabled={attester.length !== 42}
-        onClick={() => setTrustedAttester({ args: [pollId, attester as Address, true] })}
-      >
-        Set Attester
-      </Button>
+
       <Button
         disabled={schema.length !== 66}
         onClick={() => setValidSchema({ args: [pollId, schema as Address, true] })}
       >
         Set Schema
+      </Button>
+      <Button
+        disabled={attester.length !== 42}
+        onClick={() => setTrustedAttester({ args: [pollId, attester as Address, true] })}
+      >
+        Set Attester
       </Button>
       <Button
         disabled={!canStart || isPendingStartPoll}
