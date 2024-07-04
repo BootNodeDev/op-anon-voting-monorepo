@@ -6,6 +6,7 @@ import { Address } from 'viem'
 import { ActionsWrapper, BigButton, Column, ColumnFullHeight } from './Poll'
 import { Button } from '../buttons/Button'
 import { DataInput } from '../form/DataInput'
+
 import { PASSWORD } from '@/src/constants/common'
 import {
   useWriteAnonVotingEndPoll,
@@ -13,6 +14,7 @@ import {
   useWriteAnonVotingSetValidSchema,
   useWriteAnonVotingStartPoll,
 } from '@/src/hooks/generated/hooks'
+import { useWriteWithConfirmationsWagmiWrapper } from '@/src/hooks/useWriteWithConfirmationsWagmiWrapper'
 
 const Actions = styled(ActionsWrapper)`
   align-items: stretch;
@@ -22,22 +24,24 @@ type AdminPollProps = {
   pollId: bigint
   canEnd: boolean
   canStart: boolean
+  onStart: () => void
+  onEnd: () => void
 }
-export const AdminPoll = ({ canEnd, canStart, pollId }: AdminPollProps) => {
+export const AdminPoll = ({ canEnd, canStart, onEnd, onStart, pollId }: AdminPollProps) => {
   const { writeContractAsync: setTrustedAttester } = useWriteAnonVotingSetTrustedAttester()
   const { writeContractAsync: setValidSchema } = useWriteAnonVotingSetValidSchema()
   const {
     //isError: isErrorStartPoll,
-    isPending: isPendingStartPoll,
+    isWaiting: isPendingStartPoll,
     //isSuccess: isSuccessStartPoll,
     writeContractAsync: startPoll,
-  } = useWriteAnonVotingStartPoll()
+  } = useWriteWithConfirmationsWagmiWrapper(useWriteAnonVotingStartPoll, onStart)
   const {
     //isError: isErrorEndPoll,
-    isPending: isPendingEndPoll,
+    isWaiting: isPendingEndPoll,
     //isSuccess: isSuccessEndPoll,
     writeContractAsync: endPoll,
-  } = useWriteAnonVotingEndPoll()
+  } = useWriteWithConfirmationsWagmiWrapper(useWriteAnonVotingEndPoll, onEnd)
 
   const [schema, setSchema] = useState(process.env.NEXT_PUBLIC_EAS_SCHEMA ?? '')
   const [attester, setAttester] = useState(process.env.NEXT_PUBLIC_EAS_ATTESTER ?? '')

@@ -32,6 +32,7 @@ export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPoll
   const isEnrolled =
     !!currentPoll && !!publicIdentity && currentPoll.voters.includes(publicIdentity)
 
+  const canEnroll = !!currentPoll && !isEnrolled && currentPoll.state === PollState.Created
   const canVote = !!currentPoll && !!isEnrolled && currentPoll.state === PollState.Ongoing
   const canAdmin = !!currentPoll && !!address && currentPoll.coordinator === address
 
@@ -72,6 +73,7 @@ export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPoll
     currentPoll,
     isEnrolled,
     canVote,
+    canEnroll,
     canStartPoll,
     canEndPoll,
     canSetAttester,

@@ -42,11 +42,21 @@ const Home: NextPage = () => {
     // isLoading: isLoadingGettingPolls,
     refetch: getPolls,
   } = useReadAnonVotingGetPolls()
-  const { canAdmin, canEndPoll, canStartPoll, canVote, currentPoll, isEnrolled, result, votes } =
-    useCurrentPoll({
-      pollId,
-      polls,
-    } as useCurrentPollProps)
+  const {
+    canAdmin,
+    canEndPoll,
+    canEnroll,
+    canStartPoll,
+    canVote,
+    currentPoll,
+    isEnrolled,
+    result,
+    votes,
+  } = useCurrentPoll({
+    pollId,
+    polls,
+    publicIdentity,
+  } as useCurrentPollProps)
 
   console.log(polls)
   console.log(currentPoll)
@@ -116,12 +126,19 @@ const Home: NextPage = () => {
                 {currentPoll ? (
                   <>
                     {canAdmin && pollId && (
-                      <AdminPoll canEnd={canEndPoll} canStart={canStartPoll} pollId={pollId} />
+                      <AdminPoll
+                        canEnd={canEndPoll}
+                        canStart={canStartPoll}
+                        onEnd={getPolls}
+                        onStart={getPolls}
+                        pollId={pollId}
+                      />
                     )}
-                    {uid && publicIdentity && currentPoll.state !== PollState.Ended && (
+                    {uid && publicIdentity && canEnroll && (
                       <PollEnrollment
                         currentPoll={currentPoll}
                         isEnrolled={isEnrolled}
+                        onEnroll={getPolls}
                         publicIdentity={publicIdentity}
                         uid={uid}
                       />
@@ -131,6 +148,7 @@ const Home: NextPage = () => {
                         canVote={canVote}
                         currentPoll={currentPoll}
                         identity={identity}
+                        onVote={getPolls}
                         result={result}
                         votes={votes}
                       />

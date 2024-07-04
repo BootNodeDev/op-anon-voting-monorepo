@@ -6,6 +6,7 @@ import { generateProof } from '@semaphore-protocol/proof'
 import { useQuery } from '@tanstack/react-query'
 
 import { MT_DEPTH } from '../constants/common'
+
 import { PollVote } from '@/types/polls'
 
 type useCastVoteProps = { identity: Identity; vote: PollVote; voters: bigint[]; pollId: bigint }
@@ -23,7 +24,7 @@ export const useCastVote = ({ identity, pollId, vote, voters }: useCastVoteProps
   )
   const castVote = useCallback(async () => {
     const semaphoreProof = await makeProof(BigInt(vote))
-    await fetch('/api/castVote', {
+    return await fetch('/api/castVote', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,8 +34,12 @@ export const useCastVote = ({ identity, pollId, vote, voters }: useCastVoteProps
   }, [makeProof, vote])
 
   return useQuery({
-    queryKey: ['castVote'],
-    queryFn: async () => await castVote(),
+    queryKey: ['castVote', pollId.toString(), identity.getCommitment().toString()],
+    retry: false,
+    queryFn: async () => {
+      const response = await castVote()
+      if (!response.ok) throw Error('Error voting')
+    },
     enabled: false,
   })
 }

@@ -4,19 +4,21 @@ import { Identity } from '@semaphore-protocol/identity'
 
 import { BigButton, RadioButtonsWrapper, VoteWrapper } from './Poll'
 import { Radiobutton } from '../form/Radiobutton'
+
 import { BaseParagraph } from '@/src/components/text/BaseParagraph'
 import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useCastVote } from '@/src/hooks/useCastVote'
 import { Poll, useCurrentPoll } from '@/src/hooks/useCurrentPoll'
 import { PollState, PollVote } from '@/types/polls'
 
-type VotesProps = Pick<ReturnType<typeof useCurrentPoll>, 'result' | 'votes' | 'canVote'> & {
+type VotesProps = Pick<ReturnType<typeof useCurrentPoll>, 'canVote' | 'result' | 'votes'> & {
   currentPoll: Poll
-} & { identity: Identity }
-export const Votes = ({ canVote, currentPoll, identity, result, votes }: VotesProps) => {
+} & { identity: Identity } & { onVote: () => void }
+export const Votes = ({ canVote, currentPoll, identity, onVote, result, votes }: VotesProps) => {
   const [vote, setVote] = useState<PollVote>(PollVote.Yes)
   const {
     isError,
+    isFetching,
     isLoading,
     refetch: castVote,
   } = useCastVote({
@@ -34,7 +36,7 @@ export const Votes = ({ canVote, currentPoll, identity, result, votes }: VotesPr
             {currentPoll.state === PollState.Ended && 'Poll has ended'}
             {currentPoll.state === PollState.Ongoing && 'Poll is open'}
           </PageTitle>
-          <BaseParagraph>{result}</BaseParagraph>{' '}
+          {currentPoll.state === PollState.Ended && <BaseParagraph>{result}</BaseParagraph>}
         </div>
         <RadioButtonsWrapper>
           <Radiobutton
@@ -53,9 +55,11 @@ export const Votes = ({ canVote, currentPoll, identity, result, votes }: VotesPr
           </Radiobutton>
         </RadioButtonsWrapper>
 
-        <BigButton disabled={!canVote || isLoading} onClick={() => castVote}>
-          Cast Vote
-        </BigButton>
+        {canVote && (
+          <BigButton disabled={isLoading || isFetching} onClick={() => castVote().then(onVote)}>
+            Cast Vote
+          </BigButton>
+        )}
         {isError && <p>Error voting</p>}
       </VoteWrapper>
     </>
