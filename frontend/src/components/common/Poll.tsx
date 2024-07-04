@@ -75,3 +75,20 @@ export const WrapperDropdown = styled(Dropdown)`
     overflow: auto;
   }
 `
+export const Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+`
+export const ColumnFullHeight = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-grow: 1;
+  margin-top: 27px;
+  button {
+    height: 100%;
+    flex: 1;
+  }
+`

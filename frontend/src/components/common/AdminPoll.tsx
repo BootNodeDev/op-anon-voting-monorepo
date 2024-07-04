@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import styled from 'styled-components'
 
 import { Address } from 'viem'
 
-import { ActionsWrapper } from './Poll'
+import { ActionsWrapper, BigButton, Column, ColumnFullHeight } from './Poll'
 import { Button } from '../buttons/Button'
 import { DataInput } from '../form/DataInput'
 import { PASSWORD } from '@/src/constants/common'
@@ -12,6 +13,10 @@ import {
   useWriteAnonVotingSetValidSchema,
   useWriteAnonVotingStartPoll,
 } from '@/src/hooks/generated/hooks'
+
+const Actions = styled(ActionsWrapper)`
+  align-items: stretch;
+`
 
 type AdminPollProps = {
   pollId: bigint
@@ -38,48 +43,53 @@ export const AdminPoll = ({ canEnd, canStart, pollId }: AdminPollProps) => {
   const [attester, setAttester] = useState(process.env.NEXT_PUBLIC_EAS_ATTESTER ?? '')
 
   return (
-    <ActionsWrapper>
-      <DataInput
-        id="schema"
-        initialValue=""
-        label="Schema"
-        onChange={setSchema}
-        placeholder="EAS schema address"
-        value={schema}
-      />
-      <DataInput
-        id="attester"
-        initialValue=""
-        label="Attester"
-        onChange={setAttester}
-        placeholder="EAS attester address."
-        value={attester}
-      />
-
-      <Button
-        disabled={schema.length !== 66}
-        onClick={() => setValidSchema({ args: [pollId, schema as Address, true] })}
-      >
-        Set Schema
-      </Button>
-      <Button
-        disabled={attester.length !== 42}
-        onClick={() => setTrustedAttester({ args: [pollId, attester as Address, true] })}
-      >
-        Set Attester
-      </Button>
-      <Button
-        disabled={!canStart || isPendingStartPoll}
-        onClick={() => startPoll({ args: [pollId, BigInt(PASSWORD)] })}
-      >
-        Start Poll
-      </Button>
-      <Button
-        disabled={!canEnd || isPendingEndPoll}
-        onClick={() => endPoll({ args: [pollId, BigInt(PASSWORD)] })}
-      >
-        End Poll
-      </Button>
-    </ActionsWrapper>
+    <Actions>
+      <Column>
+        <DataInput
+          id="schema"
+          initialValue=""
+          label="Schema"
+          onChange={setSchema}
+          placeholder="EAS schema address"
+          value={schema}
+        />
+        <Button
+          disabled={schema.length !== 66}
+          onClick={() => setValidSchema({ args: [pollId, schema as Address, true] })}
+        >
+          Set Schema
+        </Button>
+      </Column>
+      <Column>
+        <DataInput
+          id="attester"
+          initialValue=""
+          label="Attester"
+          onChange={setAttester}
+          placeholder="EAS attester address."
+          value={attester}
+        />
+        <Button
+          disabled={attester.length !== 42}
+          onClick={() => setTrustedAttester({ args: [pollId, attester as Address, true] })}
+        >
+          Set Attester
+        </Button>
+      </Column>
+      <ColumnFullHeight>
+        <BigButton
+          disabled={!canStart || isPendingStartPoll}
+          onClick={() => startPoll({ args: [pollId, BigInt(PASSWORD)] })}
+        >
+          Start Poll
+        </BigButton>
+        <BigButton
+          disabled={!canEnd || isPendingEndPoll}
+          onClick={() => endPoll({ args: [pollId, BigInt(PASSWORD)] })}
+        >
+          End Poll
+        </BigButton>
+      </ColumnFullHeight>
+    </Actions>
   )
 }
