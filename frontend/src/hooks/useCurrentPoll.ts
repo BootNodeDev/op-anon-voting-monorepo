@@ -22,43 +22,24 @@ export type useCurrentPollProps = {
 export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPollProps) => {
   const { address } = useAccount()
 
-  console.log(pollId)
   const currentPoll = useMemo(() => {
     if (polls && pollId) {
       return polls.find((e) => e.id === pollId)
-    } else {
-      return undefined
     }
+    return undefined
   }, [pollId, polls])
 
-  // TODO Remove useMemo for fast calculations
-  const isEnrolled = useMemo(() => {
-    return !!currentPoll && !!publicIdentity && currentPoll.voters.includes(publicIdentity)
-  }, [currentPoll, publicIdentity])
+  const isEnrolled =
+    !!currentPoll && !!publicIdentity && currentPoll.voters.includes(publicIdentity)
 
-  const canVote = useMemo(() => {
-    return !!currentPoll && !!isEnrolled && currentPoll.state === PollState.Ongoing
-  }, [currentPoll, isEnrolled])
+  const canVote = !!currentPoll && !!isEnrolled && currentPoll.state === PollState.Ongoing
+  const canAdmin = !!currentPoll && !!address && currentPoll.coordinator === address
 
-  const canAdmin = useMemo(() => {
-    return !!currentPoll && !!address && currentPoll.coordinator === address
-  }, [address, currentPoll])
+  const canStartPoll = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
+  const canEndPoll = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Ongoing
 
-  const canStartPoll = useMemo(() => {
-    return !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
-  }, [canAdmin, currentPoll])
-
-  const canEndPoll = useMemo(() => {
-    return !!currentPoll && !!canAdmin && currentPoll.state === PollState.Ongoing
-  }, [canAdmin, currentPoll])
-
-  const canSetSchema = useMemo(() => {
-    return !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
-  }, [canAdmin, currentPoll])
-
-  const canSetAttester = useMemo(() => {
-    return !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
-  }, [canAdmin, currentPoll])
+  const canSetSchema = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
+  const canSetAttester = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
 
   const votes = useMemo(() => {
     const count: Record<PollVote, number> = {

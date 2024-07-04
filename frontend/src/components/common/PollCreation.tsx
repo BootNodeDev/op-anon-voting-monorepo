@@ -1,58 +1,51 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Address } from 'viem'
-import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount } from 'wagmi'
 
 import { ActionsWrapper, BigButton } from './Poll'
 import { DataInput } from '../form/DataInput'
+
 import { AlertMessage } from '@/src/components/common/AlertMessage'
 import { MT_DEPTH } from '@/src/constants/common'
 import { ZEROn } from '@/src/constants/numbers'
 import { useWriteAnonVotingCreatePoll } from '@/src/hooks/generated/hooks'
+import { Poll } from '@/src/hooks/useCurrentPoll'
+import { useWriteWithConfirmationsWagmiWrapper } from '@/src/hooks/useWriteWithConfirmationsWagmiWrapper'
 import { Maybe } from '@/types/utils'
 
-type PollCreationProps = { pollId: Maybe<bigint>; onSuccess: () => void }
-export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
+type PollCreationProps = {
+  pollId: Maybe<bigint>
+  onSuccess: () => void
+  currentPoll: Poll | undefined
+}
+export const PollCreation = ({ currentPoll, onSuccess, pollId }: PollCreationProps) => {
   const { address } = useAccount()
   const [coordinator, setCoordinator] = useState<Address | undefined>(address)
   const {
-    data: hash,
-    error: createPollError,
-    isError: isErrorCreatePoll,
-    isPending: isPendingCreatePoll,
-    isSuccess: isSuccessCreatePoll,
-    // reset,
-    status,
+    isError,
+    isSuccessMined,
+    isWaiting,
     writeContractAsync: createPoll,
-  } = useWriteAnonVotingCreatePoll()
+  } = useWriteWithConfirmationsWagmiWrapper(useWriteAnonVotingCreatePoll, onSuccess)
 
-  console.log(hash)
-  const { isSuccess, status: status2 } = useWaitForTransactionReceipt({ hash, confirmations: 1 })
-
-  useEffect(() => {
-    if (isSuccess) {
-      onSuccess()
-    }
-  }, [isSuccess, onSuccess])
-
-  console.log({ status, status2, createPollError })
   return (
     <>
       <DataInput
         description="Fill in the coordinator field with an address to create a poll. After the poll is created, the coordinator must set the valid schema and attester."
-        error={isErrorCreatePoll ? 'Error creating poll' : null}
+        error={isError ? 'Error creating poll' : null}
         id="coordinator"
         initialValue={address ?? ''}
         label="Coordinator"
         onChange={setCoordinator as Dispatch<SetStateAction<string>>}
         value={coordinator ?? ''}
       />
-      {isErrorCreatePoll && (
-        <AlertMessage isError={isErrorCreatePoll}>
+      {isError && (
+        <AlertMessage isError={isError}>
           <>Error creating the poll.</>
         </AlertMessage>
       )}
-      {isSuccessCreatePoll && (
+      {isSuccessMined && (
         <AlertMessage>
           <>The poll was created successfully.</>
         </AlertMessage>
@@ -64,7 +57,8 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
             coordinator.length === 0 ||
             pollId === null ||
             pollId === ZEROn ||
-            isPendingCreatePoll
+            isWaiting ||
+            !!currentPoll
           }
           onClick={
             () =>
@@ -74,7 +68,7 @@ export const PollCreation = ({ onSuccess, pollId }: PollCreationProps) => {
             // .finally(reset)
           }
         >
-          {isPendingCreatePoll ? 'The poll is pending creation.' : 'Create Poll'}
+          {isWaiting ? 'The poll is pending creation.' : 'Create Poll'}
         </BigButton>
       </ActionsWrapper>
     </>

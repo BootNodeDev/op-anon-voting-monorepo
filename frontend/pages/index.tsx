@@ -18,7 +18,7 @@ import { Tab, TabsWrapper } from '@/src/components/common/Tab'
 import { UserId } from '@/src/components/common/UserId'
 import { Votes } from '@/src/components/common/Votes'
 import { DataInput } from '@/src/components/form/DataInput'
-import { BigParagraph } from '@/src/components/text/BaseParagraph'
+import { BaseParagraph, BigParagraph } from '@/src/components/text/BaseParagraph'
 import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useReadAnonVotingGetPolls } from '@/src/hooks/generated/hooks'
 import { useCurrentPoll, useCurrentPollProps } from '@/src/hooks/useCurrentPoll'
@@ -27,6 +27,8 @@ import { useIdentity } from '@/src/hooks/useIdentity'
 import { usePollId } from '@/src/hooks/usePollId'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
 import { PollState } from '@/types/polls'
+import { Link } from '@/src/components/assets/Link'
+import { NavLink } from '@/src/components/navigation/NavLink'
 
 type PollForm = 'CREATE_POLL' | 'USE_POLL'
 
@@ -151,9 +153,15 @@ const Home: NextPage = () => {
                   onChange={handleChangePollId}
                   value={pollId ? pollId.toString() : ''}
                 />
+                {currentPoll && (
+                  <BaseParagraph onClick={() => setPollForm('USE_POLL')}>
+                    This poll already exists use it.
+                  </BaseParagraph>
+                )}
                 <PollCreation
                   onSuccess={() => getPolls().then(() => setPollForm('USE_POLL'))}
                   pollId={pollId}
+                  currentPoll={currentPoll}
                 />
               </>
             ) : (
