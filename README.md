@@ -1,12 +1,28 @@
 ## Overview
 In today's governance landscape ensuring the integrity and privacy of voting processes is paramount. This project outlines the development of a privacy-preserving voting governance application, leveraging cutting-edge technologies such as ZK proofs, Ethereum Attestation Services, and Semaphore.
 Key Components
-- ZK Proofs: Zero-Knowledge (ZK) proofs play a critical role in maintaining voter anonymity and data privacy. By enabling verifiable computation without revealing sensitive information, ZK ensures that the integrity of the voting process is upheld without compromising vote confidentiality.
-- Ethereum Attestation Services: Ethereum Attestation Services are utilized to create a gated voting system. These services provide robust mechanisms for verifying voter eligibility while maintaining a decentralized and secure environment. Attestations serve as cryptographic proof of identity or qualification, ensuring that only authorized participants can vote.
-- Semaphore: Semaphore is employed to allow individuals to cast verifiable votes without revealing their identities. This is crucial for preventing vote manipulation and ensuring fair outcomes.
-
+- **ZK Proofs:** Zero-Knowledge (ZK) proofs play a critical role in maintaining voter anonymity and data privacy. By enabling verifiable computation without revealing sensitive information, ZK ensures that the integrity of the voting process is upheld without compromising vote confidentiality.
+- **Ethereum Attestation Services:** Ethereum Attestation Services are utilized to create a gated voting system. These services provide robust mechanisms for verifying voter eligibility while maintaining a decentralized and secure environment. Attestations serve as cryptographic proof of identity or qualification, ensuring that only authorized participants can vote.
+- **Semaphore:** Semaphore is employed to allow individuals to cast verifiable votes without revealing their identities. This is crucial for preventing vote manipulation and ensuring fair outcomes.
 
 The proof of concept we developed aimed to demonstrate that by using technologies that we mentioned, it is possible for users to vote on different proposals anonymously, without revealing the identity of the voters.
+
+## Solution
+### Identity Generation
+Semaphore enables the creation of an identity on the client side using JavaScript, allowing for deterministic generation. The identity consists of three values: two secrets and one public. The public value is the identity commitment, while the two secrets are the nullifier and the trapdoor.
+When a user wants to participate in the voting process, the backend receives their signature and identity commitment. The backend then validates whether the public key from the signature corresponds to a badge holder. Once validated, the identity commitment is added to a group.
+
+### Flows
+#### Enrollment Flow
+User creates an Identity Commitment on the client-side, fetches their Badgeholder Attestation UID from the EAS subgraph, and submits both to the Semaphore contract (which will verify the user is in fact a Badgeholder) and if so add them to the group, which will then allow them to generate a proof for their vote.
+
+#### Voting Flow
+Once a user's Identity Commitment is added to the group and the poll has started, the user queries the contract for the group information related to the proposal they are part of. Using the group information or merkleTreeRoot, the user can generate a proof. This proof, along with the vote, is then sent to the backend to be broadcast to the Semaphore contract.
+
+
+#### Vote Count Flow
+Once the vote is cast, it is securely stored in an array in the Semaphore contract. The tally can be handled either by the frontend or the backend of the application. The process ensures public verifiability, as all voting events are published on-chain. This transparent method allows anyone to audit the votes and verify the integrity of the election process without compromising voters and their relations to a vote.
+
 
 ## Pre-requisites to Test Anon Voting
 
