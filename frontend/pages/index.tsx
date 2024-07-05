@@ -1,154 +1,79 @@
 import type { NextPage } from 'next'
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { useState } from 'react'
 
-import { Address } from 'viem'
-import { useAccount } from 'wagmi'
+import { useWatchBlocks } from 'wagmi'
 
-import { Button } from '@/src/components/buttons/Button'
-import { BaseCard } from '@/src/components/common/BaseCard'
-import { Identity } from '@/src/components/common/Identity'
-import { Formfield } from '@/src/components/form/Formfield'
-import { Radiobutton } from '@/src/components/form/Radiobutton'
-import { Textfield } from '@/src/components/form/Textfield'
-import { BigParagraph } from '@/src/components/text/BaseParagraph'
-import { BaseTitle } from '@/src/components/text/BaseTitle'
+import { ButtonDropdown } from '@/src/components/buttons/ButtonDropdown'
+import { AdminPoll } from '@/src/components/common/AdminPoll'
+import { AlertMessage } from '@/src/components/common/AlertMessage'
+import { DropdownItem } from '@/src/components/common/Dropdown'
 import {
-  useReadAnonVotingGetPolls,
-  useWriteAnonVotingCreatePoll,
-  useWriteAnonVotingSetTrustedAttester,
-  useWriteAnonVotingSetValidSchema,
-} from '@/src/hooks/generated/hooks'
+  BigButton,
+  Card,
+  NotConnected,
+  Title,
+  Wrapper,
+  WrapperDropdown,
+} from '@/src/components/common/Poll'
+import { PollCreation } from '@/src/components/common/PollCreation'
+import { PollEnrollment } from '@/src/components/common/PollEnrollment'
+import { Tab, TabsWrapper } from '@/src/components/common/Tab'
+import { UserId } from '@/src/components/common/UserId'
+import { Votes } from '@/src/components/common/Votes'
+import { DataInput } from '@/src/components/form/DataInput'
+import { SidebarLayout } from '@/src/components/layout/SidebarLayout'
+import { BigParagraph } from '@/src/components/text/BaseParagraph'
+import { PageTitle } from '@/src/components/text/BaseTitle'
+import { useReadAnonVotingGetPolls } from '@/src/hooks/generated/hooks'
+import { useCurrentPoll, useCurrentPollProps } from '@/src/hooks/useCurrentPoll'
 import { useUserAttestation } from '@/src/hooks/useEAS'
-import { MT_DEPTH, useIdentity } from '@/src/hooks/useIdentity'
+import { useIdentity } from '@/src/hooks/useIdentity'
+import { usePollId } from '@/src/hooks/usePollId'
 import { useWeb3Connection } from '@/src/providers/web3ConnectionProvider'
+import { PollState } from '@/types/polls'
 
-const Card = styled(BaseCard)`
-  //min-height: 300px;
-`
-const Wrapper = styled.section`
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  max-width: 950px;
-`
-const IdentityWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`
-const Title = styled(BaseTitle)`
-  margin: 24px 0;
-  @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
-    margin: 80px 0;
-  }
-`
-const NotConnected = styled.div`
-  padding: 32px 0px;
-  @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
-    padding: 48px 24px;
-  }
-`
-const BigButton = styled(Button)`
-  padding: 24px 36px;
-`
-const ActionsWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-`
-const VoteWrapper = styled.div`
-  display: flex;
-  align-items: start;
-  flex-direction: column;
-  gap: 24px;
-  width: 100%;
-`
-const RadioButtonsWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 0;
-  width: 100%;
-`
-
-type DataInputProps = {
-  onChange: Dispatch<SetStateAction<string>>
-  value: string
-  id: string
-  label: string
-  description?: string
-}
-const DataInput = ({ description, id, label, onChange, value }: DataInputProps) => {
-  const handleChange = useCallback(
-    (event: React.FormEvent<HTMLInputElement>) => {
-      const newValue = event && event.target ? event.currentTarget.value : ''
-      onChange(newValue)
-    },
-    [onChange],
-  )
-
-  return (
-    <>
-      <Formfield
-        description={description}
-        formControl={<Textfield id={id} onChange={handleChange} placeholder="" value={value} />}
-        label={label}
-        labelFor={label}
-      />
-    </>
-  )
-}
-
-enum PollState {
-  Created,
-  Ongoing,
-  Ended,
-}
+type PollForm = 'CREATE_POLL' | 'USE_POLL'
 
 const Home: NextPage = () => {
   const { connectWallet, isAppConnected } = useWeb3Connection()
-  const { address } = useAccount()
-  const [pollId, setPollId] = useState('1')
-  const { addVoter, castVote, createIdentity, endPoll, identity, startPoll } = useIdentity(
-    BigInt(pollId),
-  )
+  const { error: pollIdError, handleChangePollId, pollId } = usePollId()
+  const { createIdentity, identity, publicIdentity, state: identityCreationState } = useIdentity()
+  const [pollForm, setPollForm] = useState<PollForm>('CREATE_POLL')
 
-  const [vote, setVote] = useState('1')
+  const {
+    data: polls,
+    //error: errorGettingPolls,
+    // isLoading: isLoadingGettingPolls,
+    refetch: getPolls,
+  } = useReadAnonVotingGetPolls()
 
-  // TODO Move to useQuery
-  const [castVoteLoading, setCastVoteLoading] = useState(false)
-  const [castVoteError, setCastVoteError] = useState(false)
+  useWatchBlocks({
+    onBlock: () => {
+      console.log('refetching polls')
+      getPolls()
+    },
+  })
 
-  useEffect(() => {
-    setCastVoteError(false)
-    setCastVoteLoading(false)
-  }, [address, pollId])
-
-  const [schema, setSchema] = useState(process.env.NEXT_PUBLIC_EAS_SCHEMA ?? '')
-  const [attester, setAttester] = useState(process.env.NEXT_PUBLIC_EAS_ATTESTER ?? '')
-  const [coordinator, setCoordinator] = useState<Address | undefined>(address)
-  const { writeContractAsync: createPoll } = useWriteAnonVotingCreatePoll()
-  const { data: polls } = useReadAnonVotingGetPolls()
-  const { writeContractAsync: setTrustedAttester } = useWriteAnonVotingSetTrustedAttester()
-  const { writeContractAsync: setValidSchema } = useWriteAnonVotingSetValidSchema()
+  const {
+    canAdmin,
+    canEndPoll,
+    canEnroll,
+    canStartPoll,
+    canVote,
+    currentPoll,
+    isEnrolled,
+    result,
+    votes,
+  } = useCurrentPoll({
+    pollId,
+    polls,
+    publicIdentity,
+  } as useCurrentPollProps)
 
   console.log(polls)
-  const { error, isAttested, loading, uid } = useUserAttestation()
-
-  console.log({ isAttested, error, loading })
-
-  // TODO move to hook
-  const currentPollIndex = polls?.findIndex((e) => e.id === BigInt(pollId))
-  const pollExists = currentPollIndex !== -1
-  const currentPoll = pollExists && polls && currentPollIndex ? polls[currentPollIndex] : null
-  const voterEnrolled =
-    identity &&
-    currentPoll &&
-    currentPoll.voters.includes(BigInt(identity.getCommitment().toString()))
-
   console.log(currentPoll)
+  const { loading: loadingAttestation, uid } = useUserAttestation()
+
   return (
     <>
       <Title>
@@ -157,155 +82,129 @@ const Home: NextPage = () => {
       </Title>
       <Card>
         {isAppConnected ? (
-          <Wrapper>
-            <DataInput
-              description="Enter the ID of the poll you want to vote for or provide a unique ID to create a new one."
-              id="poll-id"
-              label="Poll ID"
-              onChange={setPollId}
-              value={pollId}
-            />
-            {currentPoll ? (
-              <>
-                <BigParagraph>Poll already exists</BigParagraph>
-                <IdentityWrapper>
-                  <Identity
-                    identity={identity && identity.getCommitment().toString()}
-                    message="Your identity is:"
-                    onGenerate={() => createIdentity()}
-                  />
-                  {uid && (
-                    <Identity
-                      identity={uid}
-                      message="Your attestation id is:"
-                      onGenerate={() => createIdentity()}
-                    />
-                  )}
-                </IdentityWrapper>
+          <SidebarLayout sidebarPlacement="right">
+            <Wrapper>
+              <TabsWrapper>
+                <Tab
+                  checked={pollForm === 'CREATE_POLL'}
+                  onClick={() => {
+                    setPollForm('CREATE_POLL')
+                    handleChangePollId('')
+                  }}
+                >
+                  Create poll
+                </Tab>
+                <Tab
+                  checked={pollForm === 'USE_POLL'}
+                  disabled={!polls || polls.length === 0}
+                  onClick={() => setPollForm('USE_POLL')}
+                >
+                  Vote/manage poll
+                </Tab>
+              </TabsWrapper>
 
-                {currentPoll.coordinator === address && (
-                  <ActionsWrapper>
-                    <DataInput
-                      description="Fill in the EAS schema address."
-                      id="schema"
-                      label="Schema"
-                      onChange={setSchema}
-                      value={schema}
-                    />
-                    <DataInput
-                      description="Fill in the EAS attester address."
-                      id="attester"
-                      label="Attester"
-                      onChange={setAttester}
-                      value={attester}
-                    />
-                    <Button
-                      disabled={attester.length !== 42}
-                      onClick={() =>
-                        setTrustedAttester({ args: [BigInt(pollId), attester as Address, true] })
-                      }
-                    >
-                      Set Attester
-                    </Button>
-                    <Button
-                      disabled={schema.length !== 66}
-                      onClick={() =>
-                        setValidSchema({ args: [BigInt(pollId), schema as Address, true] })
-                      }
-                    >
-                      Set Schema
-                    </Button>
-                    <Button
-                      disabled={currentPoll.state !== PollState.Created}
-                      onClick={() => startPoll()}
-                    >
-                      Start Poll
-                    </Button>
-                    <Button
-                      disabled={currentPoll.state !== PollState.Ongoing}
-                      onClick={() => endPoll()}
-                    >
-                      End Poll
-                    </Button>
-                  </ActionsWrapper>
-                )}
-
-                {!voterEnrolled ? (
-                  <Button
-                    disabled={
-                      identity === null || uid === null || currentPoll.state !== PollState.Created
+              {pollForm === 'USE_POLL' ? (
+                <>
+                  <PageTitle>Select an existing poll</PageTitle>
+                  <WrapperDropdown
+                    dropdownButton={
+                      <ButtonDropdown>
+                        {currentPoll ? <p>{currentPoll.id.toString()}</p> : <p>Select a poll</p>}
+                      </ButtonDropdown>
                     }
-                    onClick={() =>
-                      identity && uid && addVoter(identity.getCommitment().toString(), uid)
-                    }
-                    variant="primaryInverted"
-                  >
-                    Enroll to vote
-                  </Button>
-                ) : (
-                  <VoteWrapper>
-                    <RadioButtonsWrapper>
-                      <Radiobutton checked={vote === '1'} onClick={() => setVote('1')}>
-                        {`Yes ${currentPoll.votes.reduce((acc, curr) => {
-                          acc += curr.toString() == '1' ? BigInt(1) : BigInt(0)
-                          console.log(curr.toString(), acc)
-
-                          return acc
-                        }, BigInt(0))}`}
-                      </Radiobutton>
-                      <Radiobutton checked={vote === '0'} onClick={() => setVote('0')}>
-                        {`No ${currentPoll.votes.reduce((acc, curr) => {
-                          acc += curr.toString() == '0' ? BigInt(1) : BigInt(0)
-                          console.log(curr.toString(), acc)
-
-                          return acc
-                        }, BigInt(0))}`}
-                      </Radiobutton>
-                    </RadioButtonsWrapper>
-                    {/* TODO: This button should be disabled if no option was selected, the poll was not initiated  */}
-                    <BigButton
-                      disabled={
-                        currentPoll.state !== PollState.Ongoing || castVoteLoading || castVoteError
-                      }
-                      onClick={() => {
-                        setCastVoteLoading(true)
-                        castVote(+vote, currentPoll.voters as bigint[])
-                          .finally(() => setCastVoteLoading(false))
-                          .catch(() => {
-                            setCastVoteError(true)
+                    items={
+                      polls
+                        ? polls.map((item, index) => {
+                            return (
+                              <DropdownItem
+                                key={index}
+                                onClick={() => {
+                                  handleChangePollId(item.id.toString())
+                                }}
+                              >
+                                {item.id.toString()}
+                              </DropdownItem>
+                            )
                           })
-                      }}
-                    >
-                      Cast Vote
-                    </BigButton>
-                  </VoteWrapper>
-                )}
-              </>
-            ) : (
-              <>
-                <DataInput
-                  description="Fill in the coordinator field with an address to create a poll. After the poll is created, the coordinator must set the valid schema and attester."
-                  id="coordinator"
-                  label="Coordinator"
-                  onChange={setCoordinator as Dispatch<SetStateAction<string>>}
-                  value={coordinator ?? ''}
-                />
-
-                <ActionsWrapper>
-                  <Button
-                    disabled={coordinator === undefined || coordinator.length === 0}
-                    onClick={() =>
-                      createPoll({
-                        args: [BigInt(pollId), coordinator!, BigInt(MT_DEPTH)],
-                      })
+                        : []
                     }
-                  >
-                    Create Poll
-                  </Button>
-                </ActionsWrapper>
-              </>
-            )}
-          </Wrapper>
+                    onClick={console.log}
+                  ></WrapperDropdown>
+                  <UserId
+                    createIdentity={createIdentity}
+                    loading={loadingAttestation || identityCreationState === 'pending'}
+                    publicIdentity={publicIdentity}
+                    uid={uid}
+                  />
+                  {currentPoll ? (
+                    <>
+                      {canAdmin && pollId && (
+                        <AdminPoll
+                          canEnd={canEndPoll}
+                          canStart={canStartPoll}
+                          onEnd={getPolls}
+                          onStart={getPolls}
+                          pollId={pollId}
+                        />
+                      )}
+                      {uid && publicIdentity && canEnroll && (
+                        <PollEnrollment
+                          currentPoll={currentPoll}
+                          isEnrolled={isEnrolled}
+                          onEnroll={getPolls}
+                          publicIdentity={publicIdentity}
+                          uid={uid}
+                        />
+                      )}
+                      {identity && currentPoll.state !== PollState.Created && (
+                        <Votes
+                          canVote={canVote}
+                          currentPoll={currentPoll}
+                          identity={identity}
+                          onVote={getPolls}
+                          result={result}
+                          votes={votes}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <div>Please, select a poll</div>
+                  )}
+                </>
+              ) : pollForm === 'CREATE_POLL' ? (
+                <>
+                  <DataInput
+                    description="Enter the ID of the poll you wish to vote in, or provide a unique ID to create a new poll."
+                    error={pollIdError}
+                    id="poll-id"
+                    initialValue="1"
+                    label="Poll ID"
+                    onChange={handleChangePollId}
+                    value={pollId ? pollId.toString() : ''}
+                  />
+                  {currentPoll && (
+                    <>
+                      <AlertMessage isError>
+                        <>
+                          This poll already exists.{' '}
+                          <button onClick={() => setPollForm('USE_POLL')}>
+                            Vote or manage it.
+                          </button>
+                        </>
+                      </AlertMessage>
+                    </>
+                  )}
+                  <PollCreation
+                    currentPoll={currentPoll}
+                    onSuccess={() => getPolls().then(() => setPollForm('USE_POLL'))}
+                    pollId={pollId}
+                  />
+                </>
+              ) : (
+                <div>invalid form option</div>
+              )}
+            </Wrapper>
+          </SidebarLayout>
         ) : (
           <NotConnected>
             <BigParagraph>

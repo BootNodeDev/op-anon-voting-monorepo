@@ -15,7 +15,7 @@ const Wrapper = styled.div<Props>`
   row-gap: 20px;
 
   @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
-    --sidebar-width: 250px;
+    --sidebar-width: 360px;
 
     column-gap: 30px;
     flex-grow: 1;
