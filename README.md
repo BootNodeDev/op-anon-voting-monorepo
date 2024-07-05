@@ -57,12 +57,18 @@ Once a user's Identity Commitment is added to the group and the poll has started
 6. Set a valid Attester, and click on Set Attester
 7. :bulb: Now the Poll is open to enrollment. Users have to enroll at this stage to be able to vote.
 
+<img width="1512" alt="2 Create Poll" src="https://github.com/BootNodeDev/op-anon-voting-monorepo/assets/88392991/58b2800c-ad6b-4a4e-a6f0-1f4bd170ac8b">
+
+
 ### Enroll to vote
 
 1. Search for a Poll using its unique ID
 2. Click on Generate Identity
 3. If your address is attested under the correct Schema, you can enroll to vote.
 4. Click on Enroll to vote
+
+<img width="1512" alt="3 Enroll to vote" src="https://github.com/BootNodeDev/op-anon-voting-monorepo/assets/88392991/543cef48-cf03-41f6-809e-68995e3294b1">
+
 
 ### Start the poll
 
@@ -75,6 +81,11 @@ Once a user's Identity Commitment is added to the group and the poll has started
 3. Generate identity
 4. Select your vote and click on Cast Vote
 
+<img width="1512" alt="4 Vote" src="https://github.com/BootNodeDev/op-anon-voting-monorepo/assets/88392991/68b01a3a-41d4-4983-a23b-7773b8e40da0">
+
 ### End the poll
 
 1. Once the voting is completed, the coordinator can End the Poll
+
+<img width="1512" alt="5 Poll Results" src="https://github.com/BootNodeDev/op-anon-voting-monorepo/assets/88392991/d1bf9a11-640f-411c-aab8-f48e46e151d2">
+
