@@ -8,9 +8,38 @@ Key Components
 The proof of concept we developed aimed to demonstrate that by using technologies that we mentioned, it is possible for users to vote on different proposals anonymously, without revealing the identity of the voters.
 
 ## Solution
+### Technical Actors
+
+##### Frontend
+- Creates the identity
+- Generates proof of user vote
+##### Backend
+- Verifies that the addresses are attested as badge holders or any other attestation group
+
+##### Semaphore contract
+- [Reference contract]('https://github.com/semaphore-protocol/semaphore/blob/v3.15.2/packages/contracts/contracts/extensions/SemaphoreVoting.sol')
+- Adds identities to a group
+- Checks the validity of the voting option
+- Adds vote to a dynamic array for the poll id
+- Emits an event with the vote and poll id
+- Adds voter checking EAS Attestation UID
+
+##### Relayer/Coordinator
+- Relays transactions on behalf of the users
+- Is added as the coordinator for new polls
+- Could be an EOA, a Smart Contract, or a Smart Account.
+
 ### Identity Generation
 Semaphore enables the creation of an identity on the client side using JavaScript, allowing for deterministic generation. The identity consists of three values: two secrets and one public. The public value is the identity commitment, while the two secrets are the nullifier and the trapdoor.
 When a user wants to participate in the voting process, the backend receives their signature and identity commitment. The backend then validates whether the public key from the signature corresponds to a badge holder. Once validated, the identity commitment is added to a group.
+
+### Relayer
+The relayer begins by creating a proposal and assigning a Poll ID. It then adds voters to each proposal and starts the poll. When a user casts a vote, the relayer creates an object that includes the vote signal, the nullifier hash, the Poll ID, and the proof. This object is relayed to the contract. Once the voting period concludes, the relayer closes the voting.
+### Tallying
+Could be done either by the front or the backend
+Reads the events emitted by Semaphore Contract filtered by Poll ID
+Publicly verifiable since the events are published on-chain
+
 
 ### Flows
 #### Enrollment Flow
