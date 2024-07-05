@@ -3,8 +3,10 @@
 
 import { darken, rgba } from 'polished'
 
-const error = '#FF9DBA'
-const success = '#25DFD4'
+const error = '#EA4878'
+const success = '#0DBAB0'
+const errorBackground = '#FF9DBA'
+const successBackground = '#25DFD4'
 const primary = '#5C5EED'
 const darkPrimary = darken(0.2, primary)
 const secondary = '#E56399'
@@ -74,10 +76,12 @@ export const light = {
     darkGray: darkGray,
     darkGrayDarkened: darkGrayDarkened,
     error: error,
+    errorBackground: errorBackground,
     primary: primary,
     darkPrimary: darkPrimary,
     secondary: secondary,
     success: success,
+    successBackground: successBackground,
     tertiary: tertiary,
     textColor: textColor,
     darktextColor: darktextColor,
@@ -132,6 +136,14 @@ export const light = {
     backgroundColorActive: primary,
     backgroundColor: white,
     borderColor: white,
+  },
+  tab: {
+    BorderColorActive: primary,
+    BorderColor: lighterGray,
+    backgroundColorActive: white,
+    backgroundColor: white,
+    textColor: gray,
+    textColorActive: primary,
   },
   onBoard: {
     backgroundColor: componentBackgroundColor,

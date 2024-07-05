@@ -20,15 +20,18 @@ const Chevron = styled(ChevronDown)`
     }) => dropdown.color};
   }
 `
+const DropdownButton = styled(Button)`
+  width: 100%;
+`
 
 export const ButtonDropdown: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = ({
   children,
   ...restProps
 }) => {
   return (
-    <Button variant={'dropdown'} {...restProps}>
+    <DropdownButton variant={'dropdown'} {...restProps}>
       {children}
       <Chevron />
-    </Button>
+    </DropdownButton>
   )
 }
