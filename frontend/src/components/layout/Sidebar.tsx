@@ -4,13 +4,23 @@ const Wrapper = styled.aside`
   padding: ${({ theme: { card } }) => card.paddingVertical}
     calc(${({ theme: { card } }) => card.paddingHorizontal} / 2);
   border-top: 1px solid ${({ theme: { colors } }) => colors.borderColor};
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   @media (min-width: ${({ theme }) => theme.breakPoints.tabletLandscapeStart}) {
     padding: 16px;
     border-top: none;
     border-left: 1px solid ${({ theme: { colors } }) => colors.borderColor};
   }
+  a {
+    font-size: 1.3rem;
+    &:hover,
+    &:focus-visible {
+      color: ${({ theme: { colors } }) => colors.primary};
+    }
+  }
   ol {
-    margin: 8px 0 16px;
+    margin: 8px 0 0px;
     padding: 0 0 0 0px;
     li {
       list-style-position: inside;
@@ -29,6 +39,13 @@ const Title = styled.div`
 export const Sidebar: React.FC = ({ ...restProps }) => {
   return (
     <Wrapper {...restProps}>
+      <a
+        href="https://github.com/BootNodeDev/op-anon-voting-monorepo?tab=readme-ov-file#how-to-issue-an-attestation-to-an-address"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        How to issue an attestation?
+      </a>
       <div>
         <Title>Create </Title>
         <ol>
