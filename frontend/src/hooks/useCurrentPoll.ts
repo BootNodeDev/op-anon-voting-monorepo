@@ -12,7 +12,7 @@ export type Poll = {
   voters: bigint[]
 }
 
-type VotingResult = string
+type VotingResult = 'Winner is yes' | 'Winner is No' | 'The result is a tie'
 
 export type useCurrentPollProps = {
   polls: Poll[] | undefined

@@ -1,6 +1,8 @@
 import type { NextPage } from 'next'
 import { useState } from 'react'
 
+import { useWatchBlocks } from 'wagmi'
+
 import { ButtonDropdown } from '@/src/components/buttons/ButtonDropdown'
 import { AdminPoll } from '@/src/components/common/AdminPoll'
 import { AlertMessage } from '@/src/components/common/AlertMessage'
@@ -43,6 +45,14 @@ const Home: NextPage = () => {
     // isLoading: isLoadingGettingPolls,
     refetch: getPolls,
   } = useReadAnonVotingGetPolls()
+
+  useWatchBlocks({
+    onBlock: () => {
+      console.log('refetching polls')
+      getPolls()
+    },
+  })
+
   const {
     canAdmin,
     canEndPoll,

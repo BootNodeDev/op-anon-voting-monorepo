@@ -55,6 +55,6 @@ export default async function handler(
     })
     return res.status(200).json({ hash })
   } catch (e) {
-    return res.status(500).json({ message: `Error writing the contract ${e}` })
+    return res.status(403).json({ message: `Error writing the contract ${e}` })
   }
 }

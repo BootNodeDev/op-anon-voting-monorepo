@@ -38,6 +38,8 @@ export const useCastVote = ({ identity, pollId, vote, voters }: useCastVoteProps
     queryFn: async () => {
       const response = await castVote()
       if (!response.ok) throw Error('Error voting')
+
+      return response
     },
     enabled: false,
   })
