@@ -20,7 +20,6 @@ export const PageTitle = styled.h1`
   font-weight: 400;
   line-height: 1.6;
   margin: 0 0 0px;
-  width: 890px;
   max-width: 100%;
   strong {
     font-weight: 600;

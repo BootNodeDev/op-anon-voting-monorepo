@@ -31,7 +31,7 @@ export const PollCreation = ({ currentPoll, onSuccess, pollId }: PollCreationPro
   return (
     <>
       <DataInput
-        description="Fill in the coordinator field with an address to create a poll. After the poll is created, the coordinator must set the valid schema and attester."
+        description="To create a poll, fill in the coordinator field with an address. Once the poll is created, the coordinator must set the valid schema and attester."
         error={isError ? 'Error creating poll' : null}
         id="coordinator"
         initialValue={address ?? ''}
@@ -67,7 +67,7 @@ export const PollCreation = ({ currentPoll, onSuccess, pollId }: PollCreationPro
             // .finally(reset)
           }
         >
-          {isWaiting ? 'The poll is pending creation.' : 'Create Poll'}
+          {isWaiting ? 'Poll is being created.' : 'Create Poll'}
         </BigButton>
       </ActionsWrapper>
     </>

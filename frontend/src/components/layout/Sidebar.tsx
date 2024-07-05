@@ -30,12 +30,11 @@ export const Sidebar: React.FC = ({ ...restProps }) => {
   return (
     <Wrapper {...restProps}>
       <div>
-        <Title>Create, Start and End a Poll </Title>
+        <Title>Create </Title>
         <ol>
           <li>Provide a unique Poll ID</li>
           <li>Set a coordinator to govern the lifecycle of the poll</li>
           <li>Click on Create Poll</li>
-          <li>Refresh and search for the Poll you created</li>
           <li>Click on Generate Identity</li>
           <li>Set a desired Schema, and click on Set Schema</li>
           <li>Set a valid Attester, and click on Set Attester</li>
@@ -43,8 +42,6 @@ export const Sidebar: React.FC = ({ ...restProps }) => {
             Now the Poll is open to enrollment. Users have to enroll at this stage to be able to
             vote.
           </li>
-          <li>Click on Start Poll to enable voting for the enrolled users</li>
-          <li>Once the voting is completed, the coordinator can End Poll</li>
         </ol>
       </div>
       <div>
@@ -63,6 +60,12 @@ export const Sidebar: React.FC = ({ ...restProps }) => {
           <li>Enrolled users can only vote after the poll started</li>
           <li>Generate identity</li>
           <li>Select your vote and click on Cast Vote</li>
+        </ol>
+      </div>
+      <div>
+        <Title>End the poll</Title>
+        <ol>
+          <li>Once the voting is completed, the coordinator can End the Poll</li>
         </ol>
       </div>
     </Wrapper>
