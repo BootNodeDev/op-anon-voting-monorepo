@@ -54,6 +54,12 @@ export const Sidebar: React.FC = ({ ...restProps }) => {
         </ol>
       </div>
       <div>
+        <Title> Start the poll</Title>
+        <ol>
+          <li>Coordinator can click on Start Poll to enable voting for the enrolled users</li>
+        </ol>
+      </div>
+      <div>
         <Title>Vote</Title>
         <ol>
           <li>Search for a Poll using its unique ID</li>
