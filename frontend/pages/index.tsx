@@ -21,6 +21,7 @@ import { Tab, TabsWrapper } from '@/src/components/common/Tab'
 import { UserId } from '@/src/components/common/UserId'
 import { Votes } from '@/src/components/common/Votes'
 import { DataInput } from '@/src/components/form/DataInput'
+import { SidebarLayout } from '@/src/components/layout/SidebarLayout'
 import { BigParagraph } from '@/src/components/text/BaseParagraph'
 import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useReadAnonVotingGetPolls } from '@/src/hooks/generated/hooks'
@@ -81,125 +82,129 @@ const Home: NextPage = () => {
       </Title>
       <Card>
         {isAppConnected ? (
-          <Wrapper>
-            <TabsWrapper>
-              <Tab
-                checked={pollForm === 'CREATE_POLL'}
-                onClick={() => {
-                  setPollForm('CREATE_POLL')
-                  handleChangePollId('')
-                }}
-              >
-                Create poll
-              </Tab>
-              <Tab
-                checked={pollForm === 'USE_POLL'}
-                disabled={!polls || polls.length === 0}
-                onClick={() => setPollForm('USE_POLL')}
-              >
-                Vote/manage poll
-              </Tab>
-            </TabsWrapper>
+          <SidebarLayout sidebarPlacement="right">
+            <Wrapper>
+              <TabsWrapper>
+                <Tab
+                  checked={pollForm === 'CREATE_POLL'}
+                  onClick={() => {
+                    setPollForm('CREATE_POLL')
+                    handleChangePollId('')
+                  }}
+                >
+                  Create poll
+                </Tab>
+                <Tab
+                  checked={pollForm === 'USE_POLL'}
+                  disabled={!polls || polls.length === 0}
+                  onClick={() => setPollForm('USE_POLL')}
+                >
+                  Vote/manage poll
+                </Tab>
+              </TabsWrapper>
 
-            {pollForm === 'USE_POLL' ? (
-              <>
-                <PageTitle>Select an existing poll</PageTitle>
-                <WrapperDropdown
-                  dropdownButton={
-                    <ButtonDropdown>
-                      {currentPoll ? <p>{currentPoll.id.toString()}</p> : <p>Select a poll</p>}
-                    </ButtonDropdown>
-                  }
-                  items={
-                    polls
-                      ? polls.map((item, index) => {
-                          return (
-                            <DropdownItem
-                              key={index}
-                              onClick={() => {
-                                handleChangePollId(item.id.toString())
-                              }}
-                            >
-                              {item.id.toString()}
-                            </DropdownItem>
-                          )
-                        })
-                      : []
-                  }
-                  onClick={console.log}
-                ></WrapperDropdown>
-                <UserId
-                  createIdentity={createIdentity}
-                  loading={loadingAttestation || identityCreationState === 'pending'}
-                  publicIdentity={publicIdentity}
-                  uid={uid}
-                />
-                {currentPoll ? (
-                  <>
-                    {canAdmin && pollId && (
-                      <AdminPoll
-                        canEnd={canEndPoll}
-                        canStart={canStartPoll}
-                        onEnd={getPolls}
-                        onStart={getPolls}
-                        pollId={pollId}
-                      />
-                    )}
-                    {uid && publicIdentity && canEnroll && (
-                      <PollEnrollment
-                        currentPoll={currentPoll}
-                        isEnrolled={isEnrolled}
-                        onEnroll={getPolls}
-                        publicIdentity={publicIdentity}
-                        uid={uid}
-                      />
-                    )}
-                    {identity && currentPoll.state !== PollState.Created && (
-                      <Votes
-                        canVote={canVote}
-                        currentPoll={currentPoll}
-                        identity={identity}
-                        onVote={getPolls}
-                        result={result}
-                        votes={votes}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div>Please, select a poll</div>
-                )}
-              </>
-            ) : pollForm === 'CREATE_POLL' ? (
-              <>
-                <DataInput
-                  description="Enter the ID of the poll you want to vote for or provide a unique ID to create a new one."
-                  error={pollIdError}
-                  id="poll-id"
-                  initialValue="1"
-                  label="Poll ID"
-                  onChange={handleChangePollId}
-                  value={pollId ? pollId.toString() : ''}
-                />
-                {currentPoll && (
-                  <>
-                    <AlertMessage isError>
-                      <>
-                        This poll already exists.{' '}
-                        <button onClick={() => setPollForm('USE_POLL')}>Vote or manage it.</button>
-                      </>
-                    </AlertMessage>
-                  </>
-                )}
-                <PollCreation
-                  currentPoll={currentPoll}
-                  onSuccess={() => getPolls().then(() => setPollForm('USE_POLL'))}
-                  pollId={pollId}
-                />
-              </>
-            ) : (
-              <div>invalid form option</div>
-            )}
-          </Wrapper>
+              {pollForm === 'USE_POLL' ? (
+                <>
+                  <PageTitle>Select an existing poll</PageTitle>
+                  <WrapperDropdown
+                    dropdownButton={
+                      <ButtonDropdown>
+                        {currentPoll ? <p>{currentPoll.id.toString()}</p> : <p>Select a poll</p>}
+                      </ButtonDropdown>
+                    }
+                    items={
+                      polls
+                        ? polls.map((item, index) => {
+                            return (
+                              <DropdownItem
+                                key={index}
+                                onClick={() => {
+                                  handleChangePollId(item.id.toString())
+                                }}
+                              >
+                                {item.id.toString()}
+                              </DropdownItem>
+                            )
+                          })
+                        : []
+                    }
+                    onClick={console.log}
+                  ></WrapperDropdown>
+                  <UserId
+                    createIdentity={createIdentity}
+                    loading={loadingAttestation || identityCreationState === 'pending'}
+                    publicIdentity={publicIdentity}
+                    uid={uid}
+                  />
+                  {currentPoll ? (
+                    <>
+                      {canAdmin && pollId && (
+                        <AdminPoll
+                          canEnd={canEndPoll}
+                          canStart={canStartPoll}
+                          onEnd={getPolls}
+                          onStart={getPolls}
+                          pollId={pollId}
+                        />
+                      )}
+                      {uid && publicIdentity && canEnroll && (
+                        <PollEnrollment
+                          currentPoll={currentPoll}
+                          isEnrolled={isEnrolled}
+                          onEnroll={getPolls}
+                          publicIdentity={publicIdentity}
+                          uid={uid}
+                        />
+                      )}
+                      {identity && currentPoll.state !== PollState.Created && (
+                        <Votes
+                          canVote={canVote}
+                          currentPoll={currentPoll}
+                          identity={identity}
+                          onVote={getPolls}
+                          result={result}
+                          votes={votes}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <div>Please, select a poll</div>
+                  )}
+                </>
+              ) : pollForm === 'CREATE_POLL' ? (
+                <>
+                  <DataInput
+                    description="Enter the ID of the poll you wish to vote in, or provide a unique ID to create a new poll."
+                    error={pollIdError}
+                    id="poll-id"
+                    initialValue="1"
+                    label="Poll ID"
+                    onChange={handleChangePollId}
+                    value={pollId ? pollId.toString() : ''}
+                  />
+                  {currentPoll && (
+                    <>
+                      <AlertMessage isError>
+                        <>
+                          This poll already exists.{' '}
+                          <button onClick={() => setPollForm('USE_POLL')}>
+                            Vote or manage it.
+                          </button>
+                        </>
+                      </AlertMessage>
+                    </>
+                  )}
+                  <PollCreation
+                    currentPoll={currentPoll}
+                    onSuccess={() => getPolls().then(() => setPollForm('USE_POLL'))}
+                    pollId={pollId}
+                  />
+                </>
+              ) : (
+                <div>invalid form option</div>
+              )}
+            </Wrapper>
+          </SidebarLayout>
         ) : (
           <NotConnected>
             <BigParagraph>
