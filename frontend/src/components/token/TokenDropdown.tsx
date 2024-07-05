@@ -14,7 +14,7 @@ const Wrapper = styled(Dropdown)`
   --inner-padding: 8px;
 
   .dropdownItems {
-    max-height: 340px;
+    max-height: 280px;
     overflow: auto;
   }
 `

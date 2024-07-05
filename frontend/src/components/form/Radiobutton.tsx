@@ -6,10 +6,11 @@ import { LabelAlt as Label } from '@/src/components/form/Label'
 export interface Props {
   checked?: boolean
   disabled?: boolean
+  ended?: boolean
   onClick?: () => void
 }
 
-const Wrapper = styled.span<{ disabled?: boolean }>`
+const Wrapper = styled.span<{ checked?: boolean; disabled?: boolean; ended?: boolean }>`
   align-items: center;
   column-gap: 16px;
   padding: 8px;
@@ -18,11 +19,34 @@ const Wrapper = styled.span<{ disabled?: boolean }>`
   display: flex;
   flex: 1 1 0;
   font-size: 1.6rem;
-  ${({ disabled }) =>
-    disabled
+  ${({ disabled, ended }) =>
+    disabled || ended
       ? css`
           cursor: not-allowed;
-          opacity: 0.5;
+          opacity: 0.6;
+
+          .label {
+            cursor: not-allowed;
+          }
+        `
+      : css`
+          cursor: pointer;
+        `}
+  ${({ checked, ended }) =>
+    ended &&
+    checked &&
+    css`
+      border: 1px solid ${({ theme: { colors } }) => colors.primary};
+      opacity: 1;
+      label {
+        font-weight: bold;
+        color: ${({ theme: { colors } }) => colors.primary};
+      }
+    `}
+  ${({ ended }) =>
+    ended
+      ? css`
+          cursor: not-allowed;
 
           .label {
             cursor: not-allowed;
@@ -46,20 +70,29 @@ const Radio = styled.span<Props>`
   height: ${({ theme: { radioButton } }) => radioButton.dimensions};
   transition: all 0.15s linear;
   width: ${({ theme: { radioButton } }) => radioButton.dimensions};
+  ${({ ended }) =>
+    ended
+      ? css``
+      : css`
+          cursor: pointer;
+        `}
 `
 
 export const Radiobutton: React.FC<PropsWithChildren<Props>> = ({
   checked,
   children,
   disabled,
+  ended,
   onClick,
   ...restProps
 }) => {
   return (
     <Wrapper
+      checked={checked}
       disabled={disabled}
+      ended={ended}
       onClick={() => {
-        if (disabled) return
+        if (disabled || ended) return
 
         if (typeof onClick !== 'undefined') {
           onClick()
@@ -67,7 +100,7 @@ export const Radiobutton: React.FC<PropsWithChildren<Props>> = ({
       }}
       {...restProps}
     >
-      <Radio checked={checked} />
+      <Radio checked={checked} ended={ended} />
       {children && <Label>{children}</Label>}
     </Wrapper>
   )

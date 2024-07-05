@@ -71,7 +71,8 @@ const Items = styled.div<ItemsProps>`
   border: 1px solid ${({ theme: { dropdown } }) => dropdown.borderColor};
   box-shadow: ${({ theme: { dropdown } }) => dropdown.boxShadow};
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
-  min-width: 90px;
+  width: 290px;
+  max-width: 100%;
   position: absolute;
   white-space: nowrap;
 
@@ -128,14 +129,14 @@ export const DropdownItemCSS = css<ItemProps>`
   border-bottom: 1px solid ${({ theme: { dropdown } }) => dropdown.item.borderColor};
   cursor: pointer;
   display: flex;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 400;
   gap: 10px;
   justify-content: ${({ justifyContent }) => justifyContent};
-  line-height: 1.4;
+  line-height: 1.6;
   min-height: 30px;
   overflow: hidden;
-  padding: 0 12px;
+  padding: 8px 16px;
   text-decoration: none;
   transition: background-color 0.15s linear;
   user-select: none;

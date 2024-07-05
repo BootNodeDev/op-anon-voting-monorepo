@@ -58,9 +58,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         }}
       >
         <WagmiProvider config={config}>
-          <Web3ConnectionProvider>
-            <QueryClientProvider client={queryClient}>
-              <ApolloProvider client={apolloClient}>
+          <QueryClientProvider client={queryClient}>
+            <ApolloProvider client={apolloClient}>
+              <Web3ConnectionProvider>
                 <ThemeProvider>
                   <SafeSuspense>
                     <TransactionNotificationProvider>
@@ -73,9 +73,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                   </SafeSuspense>
                   <Toast />
                 </ThemeProvider>
-              </ApolloProvider>
-            </QueryClientProvider>
-          </Web3ConnectionProvider>
+              </Web3ConnectionProvider>
+            </ApolloProvider>
+          </QueryClientProvider>
         </WagmiProvider>
       </SWRConfig>
     </>
