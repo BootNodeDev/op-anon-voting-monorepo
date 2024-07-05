@@ -63,3 +63,49 @@ The proof of concept we developed aimed to demonstrate that by using technologie
 ### End the poll
 
 1. Once the voting is completed, the coordinator can End the Poll
+
+
+## For a further stage, once the POC is done and tech-related constraints and risks are mitigated
+
+* a. Enabling private/public feedback upon proposal generation: by leveraging the same gate-keeping mechanism (EAS Attestations and Semaphore Groups), we can create a feedback system that can guarantee the person providing feedback is, in fact, allowed to do so. This can be done publicly by having the poster broadcast their own transaction including an EAS Attestation UID that can be used to check whether they are allowed to provide feedback. This can be taken a step further to only allow feedback from those who provide a zk proof of having previously enrolled to vote for the proposal.
+With the use of a relayer we can make the feedback be completely private in the same way we do for casting a vote.
+```mermaid
+sequenceDiagram
+actor Alice
+participant MS as Message Storage
+participant R as Relayer
+participant SC as Smart Contract
+participant FE as Front-end
+Alice ->> MS: Create message
+MS ->> Alice: messageId
+alt Public feedback
+Alice ->> SC: Broadcast tx (messageId, Attestation UID[, ZK proof])
+else Private Feedback
+Alice ->> R: Publish message (messageId, signature, Attestation UID[, ZK proof])
+R ->> SC: Broadcast tx (messageId[, ZK proof])
+end
+FE ->> SC: Get message IDs
+SC ->> FE: Message IDs
+FE ->> MS: Get messages
+MS ->> FE: Messages
+FE ->> FE: Display all public/private feedback
+```
+
+* b. Ability to whistleblow: by leveraging the same stack used for anonymous voting (EAS Attestations + Semaphore Groups + relayer), we can add the ability to whistleblow without revealing the identity of the whistleblower. For this the whistleblower would provide the following to the relayer: a message signed with their private key that proves they are in control of a specific address; an EAS Attestation UID issued by a trusted attester to the same address; a zk proof of having previously enrolled to vote for the proposal; the leak they wish to be made public without revealing their identity.
+```mermaid
+sequenceDiagram
+actor Bob
+participant MS as Message Storage
+participant R as Relayer
+participant SC as Smart Contract
+participant FE as Front-end
+Bob ->> MS: Create leak
+MS ->> Bob: leakId
+Bob ->> R: Publish leak (leakId, signature, Attestation UID[, ZK proof])
+R ->> SC: Broadcast tx (leakId[, ZK proof])
+FE ->> SC: Get leak IDs
+SC ->> FE: Leak IDs
+FE ->> MS: Get leaks
+MS ->> FE: Leaks
+FE ->> FE: Display all leaks
+```
