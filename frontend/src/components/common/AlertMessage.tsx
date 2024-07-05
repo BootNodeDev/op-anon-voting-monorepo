@@ -30,6 +30,19 @@ const Wrapper = styled.div<{ isError?: boolean }>`
 const Icon = styled.div`
   flex-shrink: 0;
 `
+
+const AlertContent = styled.div`
+  display: flex;
+  gap: 8px;
+  button {
+    border: none;
+    font-size: 1.6rem;
+    background-color: transparent;
+    cursor: pointer;
+    text-decoration: underline;
+    color: inherit;
+  }
+`
 interface Props extends HTMLAttributes<HTMLDivElement> {
   children: ReactElement
   isError?: boolean
@@ -41,7 +54,7 @@ export const AlertMessage: React.FC<Props> = ({ children, isError, ...restProps 
       <Icon>
         <Information />
       </Icon>
-      <div>{children}</div>
+      <AlertContent>{children}</AlertContent>
     </Wrapper>
   )
 }

@@ -1,11 +1,11 @@
 import { Address } from 'viem'
 
+import { AlertMessage } from './AlertMessage'
 import { Button } from '../buttons/Button'
 import { useWriteAnonVotingAddVoter } from '@/src/hooks/generated/hooks'
 import { Poll } from '@/src/hooks/useCurrentPoll'
-import { PollState } from '@/types/polls'
 import { useWriteWithConfirmationsWagmiWrapper } from '@/src/hooks/useWriteWithConfirmationsWagmiWrapper'
-import { AlertMessage } from './AlertMessage'
+import { PollState } from '@/types/polls'
 
 type PollEnrollmentProps = {
   publicIdentity: bigint

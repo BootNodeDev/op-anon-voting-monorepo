@@ -4,7 +4,6 @@ import { Identity } from '@semaphore-protocol/identity'
 
 import { BigButton, RadioButtonsWrapper, VoteWrapper } from './Poll'
 import { Radiobutton } from '../form/Radiobutton'
-
 import { BaseParagraph } from '@/src/components/text/BaseParagraph'
 import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useCastVote } from '@/src/hooks/useCastVote'

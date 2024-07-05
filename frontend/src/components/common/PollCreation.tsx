@@ -5,7 +5,6 @@ import { useAccount } from 'wagmi'
 
 import { ActionsWrapper, BigButton } from './Poll'
 import { DataInput } from '../form/DataInput'
-
 import { AlertMessage } from '@/src/components/common/AlertMessage'
 import { MT_DEPTH } from '@/src/constants/common'
 import { ZEROn } from '@/src/constants/numbers'

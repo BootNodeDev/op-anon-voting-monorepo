@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { ButtonDropdown } from '@/src/components/buttons/ButtonDropdown'
 import { AdminPoll } from '@/src/components/common/AdminPoll'
+import { AlertMessage } from '@/src/components/common/AlertMessage'
 import { DropdownItem } from '@/src/components/common/Dropdown'
 import {
   BigButton,
@@ -18,7 +19,7 @@ import { Tab, TabsWrapper } from '@/src/components/common/Tab'
 import { UserId } from '@/src/components/common/UserId'
 import { Votes } from '@/src/components/common/Votes'
 import { DataInput } from '@/src/components/form/DataInput'
-import { BaseParagraph, BigParagraph } from '@/src/components/text/BaseParagraph'
+import { BigParagraph } from '@/src/components/text/BaseParagraph'
 import { PageTitle } from '@/src/components/text/BaseTitle'
 import { useReadAnonVotingGetPolls } from '@/src/hooks/generated/hooks'
 import { useCurrentPoll, useCurrentPollProps } from '@/src/hooks/useCurrentPoll'
@@ -170,9 +171,14 @@ const Home: NextPage = () => {
                   value={pollId ? pollId.toString() : ''}
                 />
                 {currentPoll && (
-                  <BaseParagraph onClick={() => setPollForm('USE_POLL')}>
-                    This poll already exists use it.
-                  </BaseParagraph>
+                  <>
+                    <AlertMessage isError>
+                      <>
+                        This poll already exists.{' '}
+                        <button onClick={() => setPollForm('USE_POLL')}>Vote or manage it.</button>
+                      </>
+                    </AlertMessage>
+                  </>
                 )}
                 <PollCreation
                   currentPoll={currentPoll}
