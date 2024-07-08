@@ -169,4 +169,3 @@ FE ->> MS: Get leaks
 MS ->> FE: Leaks
 FE ->> FE: Display all leaks
 ```
-docs
