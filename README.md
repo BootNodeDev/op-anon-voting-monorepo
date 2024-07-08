@@ -1,44 +1,66 @@
 ## Overview
-In today's governance landscape ensuring the integrity and privacy of voting processes is paramount. This project outlines the development of a privacy-preserving voting governance application, leveraging cutting-edge technologies such as ZK proofs, Ethereum Attestation Services, and Semaphore.
-Key Components
-- **ZK Proofs:** Zero-Knowledge (ZK) proofs play a critical role in maintaining voter anonymity and data privacy. By enabling verifiable computation without revealing sensitive information, ZK ensures that the integrity of the voting process is upheld without compromising vote confidentiality.
-- **Ethereum Attestation Services:** Ethereum Attestation Services are utilized to create a gated voting system. These services provide robust mechanisms for verifying voter eligibility while maintaining a decentralized and secure environment. Attestations serve as cryptographic proof of identity or qualification, ensuring that only authorized participants can vote.
-- Semaphore: Semaphore is employed to allow individuals to cast verifiable votes without revealing their identities. This is crucial for preventing vote manipulation and ensuring fair outcomes.
 
-The proof of concept we developed aimed to demonstrate that by using technologies that we mentioned, it is possible for users to vote on different proposals anonymously, without revealing the identity of the voters.
+In today's governance landscape ensuring the integrity and privacy of voting processes is paramount. This project
+outlines the development of a privacy-preserving voting governance application, leveraging cutting-edge technologies
+such as ZK proofs, Ethereum Attestation Services, and Semaphore. Key Components
+
+- **ZK Proofs:** Zero-Knowledge (ZK) proofs play a critical role in maintaining voter anonymity and data privacy. By
+  enabling verifiable computation without revealing sensitive information, ZK ensures that the integrity of the voting
+  process is upheld without compromising vote confidentiality.
+- **Ethereum Attestation Services:** Ethereum Attestation Services are utilized to create a gated voting system. These
+  services provide robust mechanisms for verifying voter eligibility while maintaining a decentralized and secure
+  environment. Attestations serve as cryptographic proof of identity or qualification, ensuring that only authorized
+  participants can vote.
+- Semaphore: Semaphore is employed to allow individuals to cast verifiable votes without revealing their identities.
+  This is crucial for preventing vote manipulation and ensuring fair outcomes.
+
+The proof of concept we developed aimed to demonstrate that by using technologies that we mentioned, it is possible for
+users to vote on different proposals anonymously, without revealing the identity of the voters.
 
 ## Solution
+
 ### Identity Generation
-Semaphore enables the creation of an identity on the client side using JavaScript, allowing for deterministic generation. The identity consists of three values: two secrets and one public. The public value is the identity commitment, while the two secrets are the nullifier and the trapdoor.
-When a user wants to participate in the voting process, the backend receives their signature and identity commitment. The backend then validates whether the public key from the signature corresponds to a badge holder. Once validated, the identity commitment is added to a group.
+
+Semaphore enables the creation of an identity on the client side using JavaScript, allowing for deterministic
+generation. The identity consists of three values: two secrets and one public. The public value is the identity
+commitment, while the two secrets are the nullifier and the trapdoor. When a user wants to participate in the voting
+process, the backend receives their signature and identity commitment. The backend then validates whether the public key
+from the signature corresponds to a badge holder. Once validated, the identity commitment is added to a group.
 
 ### Flows
-#### Enrollment Flow
-User creates an Identity Commitment on the client-side, fetches their Badgeholder Attestation UID from the EAS subgraph, and submits both to the Semaphore contract (which will verify the user is in fact a Badgeholder) and if so add them to the group, which will then allow them to generate a proof for their vote.
 
+#### Enrollment Flow
+
+User creates an Identity Commitment on the client-side, fetches their Badgeholder Attestation UID from the EAS subgraph,
+and submits both to the Semaphore contract (which will verify the user is in fact a Badgeholder) and if so add them to
+the group, which will then allow them to generate a proof for their vote.
 
 #### Voting Flow
-Once a user's Identity Commitment is added to the group and the poll has started, the user queries the contract for the group information related to the proposal they are part of. Using the group information or merkleTreeRoot, the user can generate a proof. This proof, along with the vote, is then sent to the backend to be broadcast to the Semaphore contract.
 
-
+Once a user's Identity Commitment is added to the group and the poll has started, the user queries the contract for the
+group information related to the proposal they are part of. Using the group information or merkleTreeRoot, the user can
+generate a proof. This proof, along with the vote, is then sent to the backend to be broadcast to the Semaphore
+contract.
 
 ## Pre-requisites to Test Anon Voting
 
 1. Have an EOA with OP ETH for gas.
-2. Have a valid attestation. Addresses with valid attestations will be enabled to vote on polls where said attestation is required.
+2. Have a valid attestation. Addresses with valid attestations will be enabled to vote on polls where said attestation
+   is required.
 
 ### How to issue an attestation to an address:
 
 1. Enter [https://optimism.easscan.org/attestations](https://optimism.easscan.org/attestations)
-2. Connect the wallet from which the Attestations are going to be granted (this address will have to be filled in the Anon Voting app as a valid attestation issuer)
+2. Connect the wallet from which the Attestations are going to be granted (this address will have to be filled in the
+   Anon Voting app as a valid attestation issuer)
 3. Click on "Make Attestation"
 4. Input `78` in the Schema input field and select `RETROPGF BADGEHOLDER`
 5. Click on "Use this Schema"
 6. Fill the fields with the following:
-    - **Recipient:** The address that will receive the attestation
-    - **RPGF ROUND :** `1`
-    - **REFERRED BY :** Leave as is. (`0x0000000000000000000000000000000000000000`)
-    - **REFERRED METHOD:** `referredMethod`
+   - **Recipient:** The address that will receive the attestation
+   - **RPGF ROUND :** `1`
+   - **REFERRED BY :** Leave as is. (`0x0000000000000000000000000000000000000000`)
+   - **REFERRED METHOD:** `referredMethod`
 7. Select "On Chain"
 8. Click on "Make attestation"
 9. Confirm the transaction
@@ -78,3 +100,66 @@ Once a user's Identity Commitment is added to the group and the poll has started
 ### End the poll
 
 1. Once the voting is completed, the coordinator can End the Poll
+
+## Development
+
+### Smart Contracts
+
+To deploy the contracts:
+
+```
+cd contracts/
+yarn
+yarn deployOp
+```
+
+With the resulting address, and setting:
+
+- `RPC_URL`: The RPC endpoint URL
+- `PRIVATE_KEY`: The account private key used to deploy contracts
+- `CURRENT_ADDRESS`: The address obtained from the deployment
+
+Next, verify the contract:
+
+```
+forge verify-contract --chain optimism --rpc-url $RPC_URL -e $ETHERSCAN_API_KEY $CURRENT_ADDRESS AnonVoting --watch
+```
+
+### UI
+
+To run the dapp:
+
+```
+cd frontend/
+yarn
+yarn dev
+```
+
+The postinstall script automatically generates types for the subgraph and hooks for contract interaction.
+
+### Environment variables
+
+#### NEXT_PUBLIC_SUBGRAPH_URI
+
+EAS subgraph URL. (e.g., `https://optimism.easscan.org/graphql`)
+
+#### NEXT_PUBLIC_ANON_VOTING_ADDRESS
+
+Address of the latest contract deployment (e.g., `0x235511e3c7b0b055fa1431576ebac4438a600bb5`)
+
+#### NEXT_PUBLIC_EAS_SCHEMA
+
+Address of the schema to query the `uid` from the EAS subgraph
+
+#### NEXT_PUBLIC_EAS_ATTESTER
+
+Address of attester to query the `uid` from the EAS subgraph
+
+#### ETHERSCAN_API_KEY
+
+API key for verifying new deployments and generating wagmi hooks for `NEXT_PUBLIC_ANON_VOTING_ADDRESS`
+
+#### PK_RELAYER
+
+Private key for the relayer account (used in serverless Next.js functions). Ensure this account has sufficient ETH for
+vote transactions.
