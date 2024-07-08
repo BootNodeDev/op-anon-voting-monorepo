@@ -122,7 +122,6 @@ Once the vote is cast, it is securely stored in an array in the Semaphore contra
 
 1. Once the voting is completed, the coordinator can End the Poll
 
-InakyMaister-patch-1
 <img width="1512" alt="5 Poll Results" src="https://github.com/BootNodeDev/op-anon-voting-monorepo/assets/88392991/d1bf9a11-640f-411c-aab8-f48e46e151d2">
 
 
