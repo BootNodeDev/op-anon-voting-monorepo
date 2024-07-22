@@ -169,3 +169,67 @@ FE ->> MS: Get leaks
 MS ->> FE: Leaks
 FE ->> FE: Display all leaks
 ```
+
+
+## Development
+
+### Smart Contracts
+
+To deploy the contracts:
+
+```
+cd contracts/
+yarn
+yarn deployOp
+```
+
+With the resulting address, and setting:
+
+- `RPC_URL`: The RPC endpoint URL
+- `PRIVATE_KEY`: The account private key used to deploy contracts
+- `CURRENT_ADDRESS`: The address obtained from the deployment
+
+Next, verify the contract:
+
+```
+forge verify-contract --chain optimism --rpc-url $RPC_URL -e $ETHERSCAN_API_KEY $CURRENT_ADDRESS AnonVoting --watch
+```
+
+### UI
+
+To run the dapp:
+
+```
+cd frontend/
+yarn
+yarn dev
+```
+
+The postinstall script automatically generates types for the subgraph and hooks for contract interaction.
+
+### Environment variables
+
+#### NEXT_PUBLIC_SUBGRAPH_URI
+
+EAS subgraph URL. (e.g., `https://optimism.easscan.org/graphql`)
+
+#### NEXT_PUBLIC_ANON_VOTING_ADDRESS
+
+Address of the latest contract deployment (e.g., `0x235511e3c7b0b055fa1431576ebac4438a600bb5`)
+
+#### NEXT_PUBLIC_EAS_SCHEMA
+
+Address of the schema to query the `uid` from the EAS subgraph
+
+#### NEXT_PUBLIC_EAS_ATTESTER
+
+Address of attester to query the `uid` from the EAS subgraph
+
+#### ETHERSCAN_API_KEY
+
+API key for verifying new deployments and generating wagmi hooks for `NEXT_PUBLIC_ANON_VOTING_ADDRESS`
+
+#### PK_RELAYER
+
+Private key for the relayer account (used in serverless Next.js functions). Ensure this account has sufficient ETH for
+vote transactions.
