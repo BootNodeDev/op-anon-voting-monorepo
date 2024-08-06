@@ -58,9 +58,6 @@ contract AnonVotingTest is Test, Constants {
 
         vm.prank(COORDINATOR);
         anonVoting.setTrustedAttester(pollId, OPTIMISM_ATTESTER, true);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setValidSchema(pollId, RETROPGF_SCHEMA_UID, true);
     }
 }
 
@@ -82,9 +79,6 @@ contract AddVoter is AnonVotingTest {
 
         vm.prank(COORDINATOR);
         anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
 
         vm.expectEmit(true, true, true, false, address(anonVoting));
         emit MemberAdded(altPollId, 0, identityCommitment, 0);
@@ -219,32 +213,6 @@ contract SetTrustedAttester is AnonVotingTest {
     function test_RevertWhen_NotCalledByCoordinator() public {
         vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
         anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
-    }
-}
-
-contract SetValidSchema is AnonVotingTest {
-    function test_CanAddValidSchema() public {
-        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), false);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
-
-        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), true);
-    }
-
-    function test_CanRemoveValidSchema() public {
-        vm.prank(COORDINATOR);
-        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
-        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), true);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, false);
-        assertEq(anonVoting.validSchemas(altPollId, RETROPGF_SCHEMA_UID), false);
-    }
-
-    function test_RevertWhen_NotCalledByCoordinator() public {
-        vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
-        anonVoting.setValidSchema(altPollId, RETROPGF_SCHEMA_UID, true);
     }
 }
 
