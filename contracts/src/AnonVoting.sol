@@ -13,6 +13,8 @@ contract AnonVoting is SemaphoreVoting {
     error AlreadyEnrolled(address voter, uint256 pollId);
     error SelfEnrollmentOnly();
 
+    bytes32 public constant SCHEMA_UID = 0xfdcfdad2dbe7489e0ce56b260348b7f14e8365a8a325aef9834818c00d46b31b;
+
     IEAS internal eas = IEAS(EAS);
 
     mapping(uint256 => mapping(address => bool)) internal enrolled;
@@ -21,7 +23,6 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => uint256) public decryptionKey;
 
     mapping(uint256 => mapping(address => bool)) public trustedAttesters;
-    mapping(uint256 => mapping(bytes32 => bool)) public validSchemas;
     mapping(uint256 => uint256[]) internal _votes;
     mapping(uint256 => uint256[]) internal _voters;
     uint256[] internal _pollIds;
@@ -44,7 +45,7 @@ contract AnonVoting is SemaphoreVoting {
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
         Attestation memory att = eas.getAttestation(uid);
 
-        if (!validSchemas[pollId][att.schema]) revert InvalidAttestation("Not a valid schema");
+        if (att.schema != SCHEMA_UID) revert InvalidAttestation("Not a valid schema");
         if (!trustedAttesters[pollId][att.attester]) revert InvalidAttestation("Not from trusted attester");
         if (att.recipient != msg.sender) revert InvalidAttestation("Does not belong to voter");
         if (enrolled[pollId][msg.sender]) revert AlreadyEnrolled(msg.sender, pollId);
@@ -85,10 +86,6 @@ contract AnonVoting is SemaphoreVoting {
 
     function setTrustedAttester(uint256 pollId, address attester, bool trusted) external onlyCoordinator(pollId) {
         trustedAttesters[pollId][attester] = trusted;
-    }
-
-    function setValidSchema(uint256 pollId, bytes32 schema, bool valid) external onlyCoordinator(pollId) {
-        validSchemas[pollId][schema] = valid;
     }
 
     function getPoll(uint256 pollId) public view returns (PollData memory) {
