@@ -51,13 +51,10 @@ contract AnonVotingTest is Test, Constants {
         vm.createSelectFork("optimism", 120_069_420);
 
         verifier = new SemaphoreVerifier();
-        anonVoting = new AnonVoting(verifier);
+        anonVoting = new AnonVoting(verifier, OPTIMISM_ATTESTER);
 
         anonVoting.createPoll(pollId, COORDINATOR, 32);
         anonVoting.createPoll(altPollId, COORDINATOR, 32);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setTrustedAttester(pollId, OPTIMISM_ATTESTER, true);
     }
 }
 
@@ -76,9 +73,6 @@ contract AddVoter is AnonVotingTest {
         Attestation memory att = eas.getAttestation(REAL_ATT_UID);
         vm.prank(att.recipient);
         anonVoting.addVoter(pollId, identityCommitment, REAL_ATT_UID);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
 
         vm.expectEmit(true, true, true, false, address(anonVoting));
         emit MemberAdded(altPollId, 0, identityCommitment, 0);
@@ -183,36 +177,6 @@ contract CastVote is AnonVotingTest {
         AnonVoting.PollData memory pollData = anonVoting.getPoll(pollId);
         assertEq(pollData.votes.length, 1);
         assertEq(pollData.votes[0], vote);
-    }
-}
-
-contract SetTrustedAttester is AnonVotingTest {
-    function setUp() public override {
-        super.setUp();
-    }
-
-    function test_CanAddTrustedAttester() public {
-        assertEq(anonVoting.trustedAttesters(altPollId, OPTIMISM_ATTESTER), false);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
-
-        assertEq(anonVoting.trustedAttesters(altPollId, OPTIMISM_ATTESTER), true);
-    }
-
-    function test_CanRemoveTrustedAttester() public {
-        vm.prank(COORDINATOR);
-        anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
-        assertEq(anonVoting.trustedAttesters(altPollId, OPTIMISM_ATTESTER), true);
-
-        vm.prank(COORDINATOR);
-        anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, false);
-        assertEq(anonVoting.trustedAttesters(altPollId, OPTIMISM_ATTESTER), false);
-    }
-
-    function test_RevertWhen_NotCalledByCoordinator() public {
-        vm.expectRevert(ISemaphoreVoting.Semaphore__CallerIsNotThePollCoordinator.selector);
-        anonVoting.setTrustedAttester(altPollId, OPTIMISM_ATTESTER, true);
     }
 }
 
