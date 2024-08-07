@@ -9,11 +9,12 @@ import { SemaphoreVerifier } from "semaphore/base/SemaphoreVerifier.sol";
 contract Deploy is BaseScript {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        address trustedAttester = vm.envAddress("TRUSTED_ATTESTER");
         vm.startBroadcast(deployerPrivateKey);
 
         SemaphoreVerifier verifier = new SemaphoreVerifier();
 
-        AnonVoting anonVoting = new AnonVoting(verifier);
+        AnonVoting anonVoting = new AnonVoting(verifier, trustedAttester);
 
         vm.stopBroadcast();
     }
