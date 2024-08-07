@@ -88,8 +88,7 @@ Once the vote is cast, it is securely stored in an array in the Semaphore contra
 2. Set a coordinator to govern the lifecycle of the poll
 3. Click on Create Poll
 4. Click on Generate Identity
-5. Set a valid Attester, and click on Set Attester
-6. :bulb: Now the Poll is open to enrollment. Users have to enroll at this stage to be able to vote.
+5. :bulb: Now the Poll is open to enrollment. Users have to enroll at this stage to be able to vote.
 
 <img width="1512" alt="2 Create Poll" src="https://github.com/BootNodeDev/op-anon-voting-monorepo/assets/88392991/58b2800c-ad6b-4a4e-a6f0-1f4bd170ac8b">
 
@@ -176,16 +175,21 @@ FE ->> FE: Display all leaks
 
 To deploy the contracts:
 
+
+Set the following environment variables:
+
+- `RPC_URL`: The RPC endpoint URL
+- `PRIVATE_KEY`: The account private key used to deploy contracts
+- `TRUSTED_ATTESTER`: The address that we consider as trusted for issuing attestations
+
 ```
 cd contracts/
 yarn
 yarn deployOp
 ```
 
-With the resulting address, and setting:
+...and set the resulting address to:
 
-- `RPC_URL`: The RPC endpoint URL
-- `PRIVATE_KEY`: The account private key used to deploy contracts
 - `CURRENT_ADDRESS`: The address obtained from the deployment
 
 Next, verify the contract:
