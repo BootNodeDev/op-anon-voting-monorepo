@@ -29,8 +29,6 @@ contract AnonVoting is SemaphoreVoting {
     uint256[] internal _pollIds;
     mapping(uint256 => string) internal _pollRetroPgfRound;
 
-    uint256 private creatingPoll = 1;
-
     struct PollData {
         uint256 id;
         address coordinator;
@@ -44,16 +42,12 @@ contract AnonVoting is SemaphoreVoting {
         TRUSTED_ATTESTER = trustedAttester;
     }
 
-    function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth) public override {
-        if (creatingPoll != 2) revert InvalidArguments("RetroPGF Round required");
-
-        super.createPoll(pollId, coordinator, merkleTreeDepth);
+    function createPoll(uint256, address, uint256) public pure override {
+        revert InvalidArguments("RetroPGF Round required");
     }
 
     function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth, string calldata round) public {
-        creatingPoll = 2;
-        createPoll(pollId, coordinator, merkleTreeDepth);
-        creatingPoll = 1;
+        super.createPoll(pollId, coordinator, merkleTreeDepth);
         _pollIds.push(pollId);
         _pollRetroPgfRound[pollId] = round;
     }
