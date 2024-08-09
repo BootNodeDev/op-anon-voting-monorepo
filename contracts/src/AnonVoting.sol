@@ -12,6 +12,7 @@ contract AnonVoting is SemaphoreVoting {
     error InvalidAttestation(string message);
     error AlreadyEnrolled(address voter, uint256 pollId);
     error SelfEnrollmentOnly();
+    error InvalidArguments(string message);
 
     bytes32 public constant SCHEMA_UID = 0xfdcfdad2dbe7489e0ce56b260348b7f14e8365a8a325aef9834818c00d46b31b;
     address public immutable TRUSTED_ATTESTER;
@@ -26,6 +27,9 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => uint256[]) internal _votes;
     mapping(uint256 => uint256[]) internal _voters;
     uint256[] internal _pollIds;
+    mapping(uint256 => string) internal _pollRetroPgfRound;
+
+    uint256 private creatingPoll = 1;
 
     struct PollData {
         uint256 id;
@@ -33,6 +37,7 @@ contract AnonVoting is SemaphoreVoting {
         PollState state;
         uint256[] votes;
         uint256[] voters;
+        string round;
     }
 
     constructor(ISemaphoreVerifier _verifier, address trustedAttester) SemaphoreVoting(_verifier) {
@@ -40,8 +45,17 @@ contract AnonVoting is SemaphoreVoting {
     }
 
     function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth) public override {
+        if (creatingPoll != 2) revert InvalidArguments("RetroPGF Round required");
+
         super.createPoll(pollId, coordinator, merkleTreeDepth);
+    }
+
+    function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth, string calldata round) public {
+        creatingPoll = 2;
+        createPoll(pollId, coordinator, merkleTreeDepth);
+        creatingPoll = 1;
         _pollIds.push(pollId);
+        _pollRetroPgfRound[pollId] = round;
     }
 
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
@@ -49,6 +63,11 @@ contract AnonVoting is SemaphoreVoting {
 
         if (att.schema != SCHEMA_UID) revert InvalidAttestation("Not a valid schema");
         if (att.attester != TRUSTED_ATTESTER) revert InvalidAttestation("Not from trusted attester");
+        // decode after checking attester is trusted, data may be maliciously constructed
+        (string memory round,,) = abi.decode(att.data, (string, address, string));
+        if (keccak256(bytes(round)) != keccak256(bytes(_pollRetroPgfRound[pollId]))) {
+            revert InvalidAttestation("Invalid RetroPGF round");
+        }
         if (att.recipient != msg.sender) revert InvalidAttestation("Does not belong to voter");
         if (enrolled[pollId][msg.sender]) revert AlreadyEnrolled(msg.sender, pollId);
 
@@ -94,6 +113,7 @@ contract AnonVoting is SemaphoreVoting {
         pollData.state = poll.state;
         pollData.votes = _votes[pollId];
         pollData.voters = _voters[pollId];
+        pollData.round = _pollRetroPgfRound[pollId];
 
         return pollData;
     }
