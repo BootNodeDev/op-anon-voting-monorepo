@@ -53,8 +53,15 @@ contract AnonVotingTest is Test, Constants {
         verifier = new SemaphoreVerifier();
         anonVoting = new AnonVoting(verifier, OPTIMISM_ATTESTER);
 
-        anonVoting.createPoll(pollId, COORDINATOR, 32);
-        anonVoting.createPoll(altPollId, COORDINATOR, 32);
+        anonVoting.createPoll(pollId, COORDINATOR, 32, "3");
+        anonVoting.createPoll(altPollId, COORDINATOR, 32, "3");
+    }
+}
+
+contract CreatePoll is AnonVotingTest {
+    function test_RevertIf_AttemptingToCreatePollWithoutRound() public {
+        vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidArguments.selector, "RetroPGF Round required"));
+        anonVoting.createPoll(2, COORDINATOR, 32);
     }
 }
 
@@ -94,6 +101,11 @@ contract AddVoter is AnonVotingTest {
     function test_RevertIf_AttestationIsNotForValidSchema() public {
         vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Not a valid schema"));
         anonVoting.addVoter(pollId, identityCommitment, INVALID_ATT_UID);
+    }
+
+    function test_RevertIf_AttestationIsForDifferentRound() public {
+        vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidAttestation.selector, "Invalid RetroPGF round"));
+        anonVoting.addVoter(pollId, identityCommitment, DIFFERENT_ROUND_ATT_UID);
     }
 
     function test_RevertIf_CoordinatorAttemptsToAddVoter() public {
@@ -202,6 +214,7 @@ contract GetPoll is GetPollTest {
         assertEq(uint256(pollData.state), uint256(ISemaphoreVoting.PollState.Created));
         assertEq(pollData.votes.length, 0);
         assertEq(pollData.voters.length, 0);
+        assertEq(pollData.round, "3");
     }
 
     function test_ReturnsMetadataForOngoingPoll() public view {
@@ -211,6 +224,7 @@ contract GetPoll is GetPollTest {
         assertEq(uint256(pollData.state), uint256(ISemaphoreVoting.PollState.Ongoing));
         assertEq(pollData.votes.length, 1);
         assertEq(pollData.voters.length, 1);
+        assertEq(pollData.round, "3");
     }
 }
 
@@ -225,11 +239,13 @@ contract GetPolls is GetPollTest {
         assertEq(pollData[0].voters.length, 1);
         assertEq(pollData[0].votes.length, 1);
         assertEq(pollData[0].votes[0], vote);
+        assertEq(pollData[0].round, "3");
 
         assertEq(pollData[1].id, altPollId);
         assertEq(pollData[1].coordinator, COORDINATOR);
         assertEq(uint256(pollData[1].state), uint256(ISemaphoreVoting.PollState.Created));
         assertEq(pollData[1].voters.length, 0);
         assertEq(pollData[1].votes.length, 0);
+        assertEq(pollData[1].round, "3");
     }
 }
