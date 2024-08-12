@@ -53,14 +53,16 @@ contract AnonVotingTest is Test, Constants {
         verifier = new SemaphoreVerifier();
         anonVoting = new AnonVoting(verifier, OPTIMISM_ATTESTER);
 
-        anonVoting.createPoll(pollId, COORDINATOR, 32, "3");
-        anonVoting.createPoll(altPollId, COORDINATOR, 32, "3");
+        anonVoting.createPoll(pollId, COORDINATOR, 32, "3", "Title 1");
+        anonVoting.createPoll(altPollId, COORDINATOR, 32, "3", "Title 2");
     }
 }
 
 contract CreatePoll is AnonVotingTest {
     function test_RevertIf_AttemptingToCreatePollWithoutRound() public {
-        vm.expectRevert(abi.encodeWithSelector(AnonVoting.InvalidArguments.selector, "RetroPGF Round required"));
+        vm.expectRevert(
+            abi.encodeWithSelector(AnonVoting.InvalidArguments.selector, "RetroPGF Round and poll title required")
+        );
         anonVoting.createPoll(2, COORDINATOR, 32);
     }
 }
@@ -215,6 +217,7 @@ contract GetPoll is GetPollTest {
         assertEq(pollData.votes.length, 0);
         assertEq(pollData.voters.length, 0);
         assertEq(pollData.round, "3");
+        assertEq(pollData.title, "Title 2");
     }
 
     function test_ReturnsMetadataForOngoingPoll() public view {
@@ -225,6 +228,7 @@ contract GetPoll is GetPollTest {
         assertEq(pollData.votes.length, 1);
         assertEq(pollData.voters.length, 1);
         assertEq(pollData.round, "3");
+        assertEq(pollData.title, "Title 1");
     }
 }
 
@@ -240,6 +244,7 @@ contract GetPolls is GetPollTest {
         assertEq(pollData[0].votes.length, 1);
         assertEq(pollData[0].votes[0], vote);
         assertEq(pollData[0].round, "3");
+        assertEq(pollData[0].title, "Title 1");
 
         assertEq(pollData[1].id, altPollId);
         assertEq(pollData[1].coordinator, COORDINATOR);
@@ -247,5 +252,6 @@ contract GetPolls is GetPollTest {
         assertEq(pollData[1].voters.length, 0);
         assertEq(pollData[1].votes.length, 0);
         assertEq(pollData[1].round, "3");
+        assertEq(pollData[1].title, "Title 2");
     }
 }

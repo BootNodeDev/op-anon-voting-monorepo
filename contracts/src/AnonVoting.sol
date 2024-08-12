@@ -28,6 +28,7 @@ contract AnonVoting is SemaphoreVoting {
     mapping(uint256 => uint256[]) internal _voters;
     uint256[] internal _pollIds;
     mapping(uint256 => string) internal _pollRetroPgfRound;
+    mapping(uint256 => string) internal _pollTitles;
 
     struct PollData {
         uint256 id;
@@ -36,6 +37,7 @@ contract AnonVoting is SemaphoreVoting {
         uint256[] votes;
         uint256[] voters;
         string round;
+        string title;
     }
 
     constructor(ISemaphoreVerifier _verifier, address trustedAttester) SemaphoreVoting(_verifier) {
@@ -43,13 +45,22 @@ contract AnonVoting is SemaphoreVoting {
     }
 
     function createPoll(uint256, address, uint256) public pure override {
-        revert InvalidArguments("RetroPGF Round required");
+        revert InvalidArguments("RetroPGF Round and poll title required");
     }
 
-    function createPoll(uint256 pollId, address coordinator, uint256 merkleTreeDepth, string calldata round) public {
+    function createPoll(
+        uint256 pollId,
+        address coordinator,
+        uint256 merkleTreeDepth,
+        string calldata round,
+        string calldata title
+    )
+        public
+    {
         super.createPoll(pollId, coordinator, merkleTreeDepth);
         _pollIds.push(pollId);
         _pollRetroPgfRound[pollId] = round;
+        _pollTitles[pollId] = title;
     }
 
     function addVoter(uint256 pollId, uint256 identityCommitment, bytes32 uid) external {
@@ -108,6 +119,7 @@ contract AnonVoting is SemaphoreVoting {
         pollData.votes = _votes[pollId];
         pollData.voters = _voters[pollId];
         pollData.round = _pollRetroPgfRound[pollId];
+        pollData.title = _pollTitles[pollId];
 
         return pollData;
     }

@@ -85,11 +85,12 @@ Once the vote is cast, it is securely stored in an array in the Semaphore contra
 ### Create
 
 1. Provide a unique Poll ID
-2. Set a coordinator to govern the lifecycle of the poll
-3. Set the required RetroPGF Round
-4. Click on Create Poll
-5. Click on Generate Identity
-6. :bulb: Now the Poll is open to enrollment. Users have to enroll at this stage to be able to vote.
+2. Provide a title for the poll
+3. Set a coordinator to govern the lifecycle of the poll
+4. Set the required RetroPGF Round
+5. Click on Create Poll
+6. Click on Generate Identity
+7. :bulb: Now the Poll is open to enrollment. Users have to enroll at this stage to be able to vote.
 
 <img width="1512" alt="2 Create Poll" src="https://github.com/BootNodeDev/op-anon-voting-monorepo/assets/88392991/58b2800c-ad6b-4a4e-a6f0-1f4bd170ac8b">
 
