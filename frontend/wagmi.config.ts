@@ -4,6 +4,7 @@ import { Address, erc20Abi } from 'viem'
 import { optimism, optimismSepolia } from 'wagmi/chains'
 
 import env from './src/config/env.server'
+import AnonVotingAbi from './src/contracts/abis/AnonVoting.abi'
 
 const config = defineConfig({
   out: 'src/hooks/generated/hooks.ts',
@@ -12,18 +13,19 @@ const config = defineConfig({
       name: 'erc20',
       abi: erc20Abi,
     },
+    {
+      name: 'AnonVoting',
+      abi: AnonVotingAbi,
+      address: {
+        [optimism.id]: process.env.NEXT_PUBLIC_ANON_VOTING_ADDRESS as Address,
+      },
+    },
   ],
   plugins: [
     etherscan({
       apiKey: env.ETHERSCAN_API_KEY,
       chainId: optimism.id,
       contracts: [
-        {
-          name: 'AnonVoting',
-          address: {
-            [optimism.id]: process.env.NEXT_PUBLIC_ANON_VOTING_ADDRESS as Address,
-          },
-        },
         {
           name: 'EASAttestation',
           address: {

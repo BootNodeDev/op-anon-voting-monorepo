@@ -61,8 +61,6 @@ const Home: NextPage = () => {
     publicIdentity,
   } as useCurrentPollProps)
 
-  console.log(polls)
-  console.log(currentPoll)
   const { loading: loadingAttestation, uid } = useUserAttestation()
 
   return (
@@ -100,7 +98,7 @@ const Home: NextPage = () => {
                   <WrapperDropdown
                     dropdownButton={
                       <ButtonDropdown>
-                        {currentPoll ? <p>{currentPoll.id.toString()}</p> : <p>Select a poll</p>}
+                        {currentPoll ? <p>{currentPoll.title}</p> : <p>Select a poll</p>}
                       </ButtonDropdown>
                     }
                     items={
@@ -113,7 +111,7 @@ const Home: NextPage = () => {
                                   handleChangePollId(item.id.toString())
                                 }}
                               >
-                                {item.id.toString()}
+                                {item.title}
                               </DropdownItem>
                             )
                           })

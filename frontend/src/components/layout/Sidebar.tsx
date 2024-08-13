@@ -51,10 +51,10 @@ export const Sidebar: React.FC = ({ ...restProps }) => {
         <ol>
           <li>Provide a unique Poll ID</li>
           <li>Set a coordinator to govern the lifecycle of the poll</li>
+          <li>Set the round of the poll</li>
+          <li>Set a title for the poll</li>
           <li>Click on Create Poll</li>
           <li>Click on Generate Identity</li>
-          <li>Set a desired Schema, and click on Set Schema</li>
-          <li>Set a valid Attester, and click on Set Attester</li>
           <li>
             Now the Poll is open to enrollment. Users have to enroll at this stage to be able to
             vote.
