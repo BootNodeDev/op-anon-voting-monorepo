@@ -10,6 +10,8 @@ export type Poll = {
   state: PollState
   votes: bigint[]
   voters: bigint[]
+  title: string
+  round: string
 }
 
 type VotingResult = 'Winner is yes' | 'Winner is No' | 'The result is a tie'
@@ -38,9 +40,6 @@ export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPoll
 
   const canStartPoll = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
   const canEndPoll = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Ongoing
-
-  const canSetSchema = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
-  const canSetAttester = !!currentPoll && !!canAdmin && currentPoll.state === PollState.Created
 
   const votes = useMemo(() => {
     const count: Record<PollVote, number> = {
@@ -76,8 +75,6 @@ export const useCurrentPoll = ({ pollId, polls, publicIdentity }: useCurrentPoll
     canEnroll,
     canStartPoll,
     canEndPoll,
-    canSetAttester,
-    canSetSchema,
     canAdmin,
     result,
     votes,

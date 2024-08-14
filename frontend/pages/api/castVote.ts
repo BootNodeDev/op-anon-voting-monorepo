@@ -37,7 +37,6 @@ export default async function handler(
   } as const
 
   const signal = BigInt(vote)
-  console.log({ externalNullifier, nullifierHash, proof, signal })
 
   const account = privateKeyToAccount(`0x${PK_RELAYER}`)
 

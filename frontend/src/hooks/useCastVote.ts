@@ -6,6 +6,7 @@ import { generateProof } from '@semaphore-protocol/proof'
 import { useQuery } from '@tanstack/react-query'
 
 import { MT_DEPTH } from '../constants/common'
+
 import { PollVote } from '@/types/polls'
 
 type useCastVoteProps = { identity: Identity; vote: PollVote; voters: bigint[]; pollId: bigint }
