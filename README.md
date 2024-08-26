@@ -1,4 +1,18 @@
-## Overview
+<img src="https://www.bootnode.dev/external/github-headers/avoting.png" alt="bootnode anon voting banner" align="center" />
+<br />
+
+<div align="center"><strong>Revolutionary anonymous voting system</strong></div>
+<div align="center">Preserves users’ identity privacy</div>
+
+<br />
+
+# Anon Voting
+
+![CI](https://github.com/BootNodeDev/op-anon-voting-monorepo/actions/workflows/ci.yml/badge.svg)
+![TS](https://img.shields.io/badge/TypeScript-^5.4-blue)
+![SOL](https://img.shields.io/badge/Solidity-0.8.4-blue)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
+
 In today's governance landscape ensuring the integrity and privacy of voting processes is paramount. This project outlines the development of a privacy-preserving voting governance application, leveraging cutting-edge technologies such as ZK proofs, Ethereum Attestation Services, and Semaphore.
 Key Components
 - **ZK Proofs:** Zero-Knowledge (ZK) proofs play a critical role in maintaining voter anonymity and data privacy. By enabling verifiable computation without revealing sensitive information, ZK ensures that the integrity of the voting process is upheld without compromising vote confidentiality.
