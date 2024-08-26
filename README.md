@@ -65,7 +65,7 @@ Once the vote is cast, it is securely stored in an array in the Semaphore contra
 ### How to issue an attestation to an address:
 
 1. Enter [https://optimism.easscan.org/attestations](https://optimism.easscan.org/attestations)
-2. Connect the wallet from which the Attestations are going to be granted ((this address will have to be set as an environment variable `TRUSTED_ATTESTER` when deploying the smart contracts)
+2. Connect the wallet from which the Attestations are going to be granted (this address will have to be set as an environment variable `TRUSTED_ATTESTER` when deploying the smart contracts)
 3. Click on "Make Attestation"
 4. Input `78` in the Schema input field and select `RETROPGF BADGEHOLDER`
 5. Click on "Use this Schema"
