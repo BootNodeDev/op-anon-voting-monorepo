@@ -82,6 +82,10 @@ Once the vote is cast, it is securely stored in an array in the Semaphore contra
 
 ## How to use Anon Voting
 
+### Demo
+[![Welcome to anon voting](https://i.vimeocdn.com/video/1914972606-71a1332ab582caddfcc8bb0c3ab9f7e9dc03e5aa08ed672f2043b24adcb0fa2e-d)](https://vimeo.com/998842028)
+
+
 ### Create
 
 1. Provide a unique Poll ID
