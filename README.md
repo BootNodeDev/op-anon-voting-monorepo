@@ -1,12 +1,15 @@
-<img src="https://www.bootnode.dev/external/github-headers/avoting.png" alt="bootnode anon voting banner" align="center" />
+<p align="center">
+    <a href="https://bootnode.dev">
+      <img src="https://www.bootnode.dev/external/github-headers/avoting.png" alt="bootnode anon voting banner">
+    </a>
+</p>
 <br />
 
 <div align="center"><strong>Revolutionary anonymous voting system</strong></div>
 <div align="center">Preserves users’ identity privacy</div>
-
 <br />
 
-# Anon Voting
+# Anonimous Voting
 
 ![CI](https://github.com/BootNodeDev/op-anon-voting-monorepo/actions/workflows/ci.yml/badge.svg)
 ![TS](https://img.shields.io/badge/TypeScript-^5.4-blue)
