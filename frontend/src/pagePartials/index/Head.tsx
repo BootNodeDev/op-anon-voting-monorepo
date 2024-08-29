@@ -7,9 +7,9 @@ export const Head = () => {
       : { hostname: 'localhost', port: 3000, protocol: 'http:' }
   const portString = port ? `:${port}` : ''
   const siteURL = typeof window !== 'undefined' ? `${protocol}//${hostname}${portString}` : ''
-  const title = 'BootNode - Frontend Starter Kit'
-  const description = 'BootNode - Frontend Starter Kit'
-  const twitterHandle = '@'
+  const title = 'Anonymous Voting PoC'
+  const description = 'Anonymous Voting PoC'
+  const twitterHandle = '@bootnodedev'
 
   return (
     <NextHead>
